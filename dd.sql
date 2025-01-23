@@ -13,6 +13,13 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE products (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -21,24 +28,22 @@ CREATE TABLE products (
     stock_quantity INT NOT NULL,
     category_id INT,
     image_url VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
+    category_id INT,
     order_date DATE NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
 CREATE TABLE order_items (
@@ -56,10 +61,12 @@ CREATE TABLE cart (
     cart_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     product_id INT,
+    category_id INT,
     quantity INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
 CREATE TABLE reviews (
@@ -71,4 +78,12 @@ CREATE TABLE reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+CREATE TABLE cart_order_items (
+    cart_id INT,
+    order_item_id INT,
+    PRIMARY KEY (cart_id, order_item_id),
+    FOREIGN KEY (cart_id) REFERENCES cart(cart_id),
+    FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id)
 );
