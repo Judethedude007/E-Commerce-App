@@ -16,7 +16,7 @@ const categories = [
 
 const CategorySection = () => {
   return (
-    <div className="relative py-6 bg-gray-900 h-58">
+    <div className="relative py-6.5 bg-gray-900 h-58 mt-16.5">
       <SearchBar />
     <div className="max-w-screen-lg mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 relative">
       {categories.map((category, index) => (

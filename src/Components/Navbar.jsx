@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import './Navbar.css'
 const Navbar = () => {
   return (
-    <nav className="bg-white shadow-md py-3 px-6 flex items-center w-full">
+    <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
       <div className="flex-grow flex justify-start">
         <h1 className="text-xl font-bold text-green-600">SecondHandStore</h1>
       </div>
