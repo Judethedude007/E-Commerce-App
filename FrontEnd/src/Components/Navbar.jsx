@@ -5,10 +5,10 @@ const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
 
   function handleLogout() {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/signin");
-  }
+    localStorage.removeItem("user"); 
+    setUser(null); 
+    navigate("/login"); 
+}
 
   return (
     <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
