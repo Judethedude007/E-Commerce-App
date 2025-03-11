@@ -4,9 +4,9 @@ const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
 
   function handleLogout() {
-    localStorage.removeItem("user"); // Clear user data
-    setUser(null); // Reset state
-    navigate("/signin"); // Redirect to Sign in page
+    localStorage.removeItem("user"); 
+    setUser(null); 
+    navigate("/login"); 
   }
 
   return (
