@@ -1,16 +1,23 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
 
   function handleLogout() {
+<<<<<<< HEAD
     localStorage.removeItem("user"); 
     setUser(null); 
     navigate("/login"); 
+=======
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/signin");
+>>>>>>> 13034e1e408b2b4f1f0d6e282f08cf87d18e82ef
   }
 
   return (
-    <nav className="bg-white shadow-md py-3 px-6 flex items-center w-full">
+    <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
       <div className="flex-grow flex justify-start">
         <h1 className="text-xl font-bold text-green-600">SecondHandStore</h1>
       </div>
@@ -53,7 +60,7 @@ const Navbar = ({ user, setUser }) => {
           </div>
         ) : (
           <NavLink to="/Signin">
-            <button className="bg-green-600 text-white py-2 px-4 rounded-lg cursor-pointer border-2 border-transparent hover:bg-white hover:text-green-600 hover:border-green-600">
+            <button className="bg-green-600 text-white py-2 rounded-lg w-22 cursor-pointer border-2 border-transparent hover:bg-white hover:text-green-600 hover:border-green-600 box-border">
               Sign in
             </button>
           </NavLink>
