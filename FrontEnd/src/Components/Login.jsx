@@ -17,7 +17,7 @@ const Login = () => {
         console.log(response.data);
         if (response.data.message) {
           alert("Login Successful");
-          localStorage.setItem("username", JSON.stringify(response.data.username)); // Store user data
+          localStorage.setItem("username", response.data.user.username);
           navigate("/");
         } else {
           alert("Invalid Credentials");

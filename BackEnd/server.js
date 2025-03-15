@@ -1,6 +1,6 @@
-const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
+import express from 'express';
+import mysql from 'mysql';
+import cors from 'cors';
 
 const app = express();
 
@@ -8,12 +8,19 @@ app.use(cors());
 app.use(express.json()); 
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
+    host: 'mysql-1d992de-second-store.h.aivencloud.com',
+    user: 'avnadmin',
+    password: 'AVNS_fDglEymAcbSnEJ-9_AZ',
+    port:'23654',
     database: 'project'
 });
-
+db.connect((err) => {
+    if (err) {
+        console.error("❌ Database connection failed:", err);
+    } else {
+        console.log("✅ Connected to MySQL database");
+    }
+});
 
 app.post('/login', (req, res) => {
     const sql = "SELECT * FROM login WHERE email = ? AND password = ?";
@@ -36,17 +43,17 @@ app.post('/signup', (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-        console.log("Missing fields:", req.body); // Debug log
+        console.log("Missing fields:", req.body);
         return res.json({ error: "All fields are required" });
     }
 
-    console.log("Signup request received:", req.body); // Log request data
+    console.log("Signup request received:", req.body);
 
-    const checkEmailQuery = "SELECT * FROM login WHERE email = ?";
+    const checkEmailQuery = "SELECT * FROM `login` WHERE `email` = ?";
     db.query(checkEmailQuery, [email], (err, data) => {
         if (err) {
             console.error("Error checking email:", err);
-            return res.json({ error: "Error checking email", details: err });
+            return res.json({ error: "Error checking email" });
         }
 
         if (data.length > 0) {
@@ -54,17 +61,19 @@ app.post('/signup', (req, res) => {
             return res.json({ error: "Email already registered" });
         }
 
-        const insertQuery = "INSERT INTO login (name, email, password) VALUES (?, ?, ?)";
+        const insertQuery = "INSERT INTO `login` (`username`, `email`, `password`) VALUES (?, ?, ?)";
         db.query(insertQuery, [name, email, password], (err, result) => {
             if (err) {
                 console.error("Error inserting data:", err);
-                return res.json({ error: "Signup failed", details: err });
+                return res.json({ error: "Signup failed" });
             }
             console.log("User registered successfully:", result);
-            return res.json({ message: "Signup successful" });
+            return res.json({ message: "Signup successful" }); // ✅ Only one response
         });
     });
 });
+
+
 
 
 app.listen(8081, () => {

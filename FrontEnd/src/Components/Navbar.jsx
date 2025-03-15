@@ -1,14 +1,28 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"; 
 import "./Navbar.css";
 
-const Navbar = ({ user, setUser }) => {
+const Navbar = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState(""); // Initialize as empty
+
+  // Load username from localStorage on first render
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    console.log("Stored username:", storedUsername); // Debugging log
+
+    if (storedUsername && storedUsername !== "undefined" && storedUsername !== "null") {
+      setUsername(storedUsername);
+    } else {
+      setUsername(""); // Ensure it's reset properly
+    }
+  }, []);
 
   function handleLogout() {
-    localStorage.removeItem("user"); 
-    setUser(null); 
-    navigate("/login"); 
-}
+    localStorage.removeItem("username");
+    setUsername(""); // Clear username from state
+    navigate("/login");
+  }
 
   return (
     <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
@@ -42,9 +56,9 @@ const Navbar = ({ user, setUser }) => {
       </div>
 
       <div className="flex-grow flex justify-end space-x-3 ml-25">
-        {user ? (
+        {username ? (
           <div className="flex items-center space-x-4">
-            <span className="text-green-600 font-semibold">{user.name}</span>
+            <span className="text-green-600 font-semibold">{username}</span>
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white py-2 px-4 rounded-lg cursor-pointer border-2 border-transparent hover:bg-white hover:text-red-500 hover:border-red-500"
