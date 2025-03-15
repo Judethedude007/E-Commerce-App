@@ -13,12 +13,10 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -41,14 +39,17 @@ const Signup = () => {
       });
 
       const data = await response.json();
+      console.log("Signup Response:", data); // Debugging
 
       if (data.error) {
         setError(data.error);
       } else {
-        setSuccess("Signup successful");
-        setTimeout(() => navigate("/"), 2000);
+        setSuccess("Signup successful! Redirecting...");
+        localStorage.setItem("username", formData.name); // ✅ Fix localStorage
+        navigate("/"); // ✅ Redirect immediately
       }
     } catch (err) {
+      console.error("Signup Error:", err);
       setError("Something went wrong. Please try again.");
     }
   };
