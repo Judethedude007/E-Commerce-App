@@ -1,28 +1,49 @@
 import searchIcon from '../assets/2946467-200.png';
+import { useState } from "react";
 
-const SearchBar = () => {
+const SearchBar = ({ products }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const handleSearch = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+    setFilteredProducts(
+      products.filter((p) =>
+        p.name.toLowerCase().includes(term.toLowerCase())
+      )
+    );
+  };
+
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-180 z-10 rounded-2xl shadow-xl">
-      <div className="flex items-center w-full h-15">
+    <div className="flex items-center w-full max-w-md z-10 rounded-2xl shadow-xl transition-all duration-300 p-2">
+      <div className="flex items-center w-full h-10 sm:h-14 bg-black rounded-2xl">
         <input
           type="text"
           placeholder="Search"
-          className="p-4 pb-5 text-xl rounded-l-2xl border-none focus:outline-none focus:ring-0 bg-white w-full h-full flex items-center justify-center"
+          className="p-2 text-sm sm:text-xl text-white bg-black rounded-l-2xl border-none focus:outline-none w-full h-full"
           spellCheck="false"
+          value={searchTerm}
+          onChange={handleSearch}
         />
         <button
-          onClick={() => alert("Search clicked")}
-          className="p-2 bg-green-600 text-white rounded-r-2xl hover:bg-green-700 focus:outline-none h-full w-14 flex items-center justify-center"
+          className="p-2 bg-green-600 text-white rounded-r-2xl hover:bg-green-700 hover:scale-110 hover:cursor-pointer transition-all duration-300 focus:outline-none h-full w-10 sm:w-16 flex items-center justify-center"
         >
-          <img
-            src={searchIcon}
-            alt="search icon"
-            className="w-6 h-6 transform scale-200"
-          />
+          <img src={searchIcon} alt="Search" className="w-4 sm:w-6 h-4 sm:h-6" />
         </button>
       </div>
+      {searchTerm && (
+        <ul className="absolute top-full mt-2 w-full bg-white shadow-lg rounded-lg p-2">
+          {filteredProducts.map((p) => (
+            <li key={p.id} className="p-2 hover:bg-gray-100 cursor-pointer">
+              {p.name}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
 
 export default SearchBar;
+

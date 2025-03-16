@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+.transition-effect {
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.5);
+  opacity: 0;
+}
+
+.swirl-effect {
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.5) rotate(360deg);
+  opacity: 0;
+}
