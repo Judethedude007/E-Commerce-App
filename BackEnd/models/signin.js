@@ -1,5 +1,5 @@
 import express from 'express';
-import db from './database.js';
+import {authDB} from './database.js';
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ const router = express.Router();
         console.log("Signup request received:", req.body);
     
         const checkEmailQuery = "SELECT * FROM `login` WHERE `email` = ?";
-        db.query(checkEmailQuery, [email], (err, data) => {
+        authDB.query(checkEmailQuery, [email], (err, data) => {
             if (err) {
                 console.error("Error checking email:", err);
                 return res.json({ error: "Error checking email" });
@@ -27,7 +27,7 @@ const router = express.Router();
             }
     
             const insertQuery = "INSERT INTO `login` (`username`, `email`, `password`) VALUES (?, ?, ?)";
-            db.query(insertQuery, [name, email, password], (err, result) => {
+            authDB.query(insertQuery, [name, email, password], (err, result) => {
                 if (err) {
                     console.error("Error inserting data:", err);
                     return res.json({ error: "Signup failed" });
