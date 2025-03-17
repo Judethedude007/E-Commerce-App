@@ -20,17 +20,17 @@ const ProductSection = () => {
       });
 
     // Fetch products from Fake Store API
-    const fakeStoreProducts = fetch("https://fakestoreapi.com/products")
+    const fakeStoreProducts = fetch("https://api.escuelajs.co/api/v1/products")
       .then(res => res.json())
       .then(data => {
-        // Transform Fake Store API data to match your product format
+        
         return data.map(item => ({
-          id: `fake-${item.id}`, // Add prefix to avoid ID conflicts
+          id: `fake-${item.id}`,
           title: item.title,
           price: item.price,
-          category: item.category,
-          image_url: item.image,
-          isFakeStore: true // Flag to identify source
+          category: item.category?.name || "Unknown Category",
+          image_url: item.images[1],
+          isFakeStore: true 
         }));
       })
       .catch(err => {
