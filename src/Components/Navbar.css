@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+.swirl-effect {
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.5) rotate(360deg);
+  opacity: 0;
+}
+
+.navbar {
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-left {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.navbar-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #38a169;
+}
+
+.navbar-center {
+  display: none;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .navbar-center {
+    display: flex;
+  }
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.125rem;
+}
+
+.active-link {
+  color: #38a169;
+}
+
+.inactive-link {
+  color: #4a5568;
+}
+
+.navbar-search {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-right {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.logout-button {
+  background-color: #e53e3e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: white;
+  color: #e53e3e;
+  border-color: #e53e3e;
+}
+
+.signin-button {
+  background-color: #38a169;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.signin-button:hover {
+  background-color: white;
+  color: #38a169;
+  border-color: #38a169;
+}
+
+.signin-button:active {
+  animation: swirl 0.5s forwards;
+}
+
+@keyframes swirl {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.category-image-container {
+  overflow: hidden;
+  width: 100%;
+  height: 200px; /* Adjust the height as needed */
+  position: relative;
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.category-image:hover {
+  transform: scale(1.1);
+}
