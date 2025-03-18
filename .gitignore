@@ -10,7 +10,7 @@ lerna-debug.log*
 # Ignore node_modules in both FrontEnd and BackEnd
 FrontEnd/node_modules/
 BackEnd/node_modules/
-
+.env
 dist
 dist-ssr
 *.local

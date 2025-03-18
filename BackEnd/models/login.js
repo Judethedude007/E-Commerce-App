@@ -1,12 +1,12 @@
 import express from "express";
-import db from "./database.js";
+import {authDB} from "./database.js";
 const router = express.Router();
 
 router.post('/', (req, res) => {
     const sql = "SELECT * FROM login WHERE email = ? AND password = ?";
     const values = [req.body.email, req.body.password];
 
-    db.query(sql, values, (err, data) => {
+    authDB.query(sql, values, (err, data) => {
         if (err) {
             return res.json({ error: "Login failed", details: err });
         }

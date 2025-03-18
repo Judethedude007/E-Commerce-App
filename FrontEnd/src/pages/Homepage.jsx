@@ -1,5 +1,5 @@
 import CategorySection from "../components/CategorySection";
-import ProductSection from "../components/ProductSection";
+import ProductSection from "../Components/ProductSection";
 import Footer from "../Components/Footer";
 
 const Home = () => {

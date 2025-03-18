@@ -1,26 +1,25 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react"; 
+import { useEffect, useState } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); // Initialize as empty
+  const [username, setUsername] = useState("");
+  const [isOpen, setIsOpen] = useState(false); // Dropdown state
 
-  // Load username from localStorage on first render
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
-    console.log("Stored username:", storedUsername); // Debugging log
-
     if (storedUsername && storedUsername !== "undefined" && storedUsername !== "null") {
       setUsername(storedUsername);
     } else {
-      setUsername(""); // Ensure it's reset properly
+      setUsername("");
     }
   }, []);
 
   function handleLogout() {
     localStorage.removeItem("username");
-    setUsername(""); // Clear username from state
+    setUsername("");
+    setIsOpen(false); // Close dropdown
     navigate("/login");
   }
 
@@ -35,9 +34,7 @@ const Navbar = () => {
           <li>
             <NavLink
               to="/"
-              className={({ isActive }) =>
-                isActive ? "text-green-600" : "text-gray-700"
-              }
+              className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}
             >
               Home
             </NavLink>
@@ -45,9 +42,7 @@ const Navbar = () => {
           <li>
             <NavLink
               to="/Sellitems"
-              className={({ isActive }) =>
-                isActive ? "text-green-600" : "text-gray-700"
-              }
+              className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}
             >
               Sell Items
             </NavLink>
@@ -55,16 +50,28 @@ const Navbar = () => {
         </ul>
       </div>
 
-      <div className="flex-grow flex justify-end space-x-3 ml-25">
+      <div className="relative flex-grow flex justify-end space-x-3 ml-25">
         {username ? (
           <div className="flex items-center space-x-4">
-            <span className="text-green-600 font-semibold">{username}</span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white py-2 px-4 rounded-lg cursor-pointer border-2 border-transparent hover:bg-white hover:text-red-500 hover:border-red-500"
+            {/* Circular Avatar with First Letter */}
+            <div
+              className="w-10 h-10 flex items-center justify-center bg-green-600 text-white font-bold rounded-full cursor-pointer"
+              onClick={() => setIsOpen(!isOpen)}
             >
-              Logout
-            </button>
+              {username.charAt(0).toUpperCase()}
+            </div>
+
+            {/* Dropdown Menu */}
+            {isOpen && (
+              <div className="absolute right-0 mr-3 mt-22 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <NavLink to="/Signin">

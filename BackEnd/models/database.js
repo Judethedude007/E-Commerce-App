@@ -1,17 +1,34 @@
 import mysql from "mysql";
+import dotenv from "dotenv";
 
-const db = mysql.createConnection({
-    host: 'mysql-1d992de-second-store.h.aivencloud.com',
-    user: 'avnadmin',
-    password: 'AVNS_fDglEymAcbSnEJ-9_AZ',
-    port:'23654',
-    database: 'project'
-});
-db.connect((err) => {
-    if (err) {
-        console.error("❌ Database connection failed:", err);
-    } else {
-        console.log("✅ Connected to MySQL database");
-    }
-});
-export default db;
+dotenv.config();
+
+const dbConfig = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME
+};
+
+
+const authDB = mysql.createPool({ ...dbConfig, database: "project" });
+const productDB = mysql.createPool({ ...dbConfig, database: "project" });
+
+
+const connectDB = (db, name) => {
+    db.getConnection((err, connection) => {
+        if (err) {
+            console.error(`❌ ${name} connection failed:`, err);
+        } else {
+            console.log(`✅ Connected to ${name}`);
+            connection.release(); 
+        }
+    });
+};
+
+connectDB(authDB, "AuthDB (Login)");
+connectDB(productDB, "ProductDB (Products)");
+
+
+export { authDB, productDB };
