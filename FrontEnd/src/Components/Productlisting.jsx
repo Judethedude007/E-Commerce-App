@@ -81,6 +81,7 @@ const ProductListing = () => {
     <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-6">
       <h2 className="text-2xl font-bold mb-4">List Your Product</h2>
 
+
       <div className="flex gap-6">
         {/* Image Upload */}
         <label className="w-32 h-32 border-2 border-dashed flex items-center justify-center text-gray-500 cursor-pointer">
@@ -91,6 +92,7 @@ const ProductListing = () => {
             "Upload Image"
           )}
         </label>
+
 
         <div className="flex flex-col gap-3 flex-grow">
           <input type="text" name="title" placeholder="Product Name" className="border p-2 rounded" onChange={handleChange} value={formData.title} />

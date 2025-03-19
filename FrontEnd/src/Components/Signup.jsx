@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import googleLogo from "../assets/google-logo.png";
 import { Link, useNavigate } from "react-router-dom";
+import "./Signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -54,9 +55,18 @@ const Signup = () => {
     }
   };
 
+  const handleSigninClick = (e) => {
+    e.preventDefault();
+    const link = document.getElementById("signin-link");
+    link.classList.add("active");
+    setTimeout(() => {
+      navigate("/Signin");
+    }, 500);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-600">
-      <div className="bg-white flex flex-col rounded-lg shadow-lg overflow-hidden max-w-md w-full p-6">
+    <div className="flex items-center justify-center min-h-screen bg-green-600 p-4">
+      <div className="bg-white flex flex-col rounded-lg shadow-lg overflow-hidden max-w-md w-full p-6 sm:p-10">
         <h2 className="text-2xl font-bold text-black mb-2 text-center">Sign Up</h2>
         <p className="text-black mb-3 text-center">Create an account to get started.</p>
 
@@ -112,7 +122,10 @@ const Signup = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-green-700 text-white py-3 rounded-lg">
+          <button
+            type="submit"
+            className="w-full mt-3 bg-green-700 text-white py-3 rounded-lg transition-all duration-300 ease-in-out transform hover:bg-red-800 hover:scale-105 hover:shadow-lg active:scale-95 cursor-pointer"
+          >
             Sign Up
           </button>
         </form>
@@ -128,7 +141,14 @@ const Signup = () => {
         </button>
 
         <p className="text-sm text-center text-gray-500 mt-4">
-          Already have an account? <Link to="/login" className="text-green-800 underline">Log in</Link>
+          Already have an account? <a
+            id="signin-link"
+            href="/Signin"
+            onClick={handleSigninClick}
+            className="text-green-800 underline hover:text-red-600 transition-colors duration-300 green-drop-effect"
+          >
+            Log in
+          </a>
         </p>
       </div>
     </div>

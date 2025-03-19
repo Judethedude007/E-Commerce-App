@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -19,9 +20,16 @@ const Navbar = () => {
   function handleLogout() {
     localStorage.removeItem("username");
     setUsername("");
-    setIsOpen(false); // Close dropdown
+    setIsOpen(false); 
     navigate("/login");
   }
+  const handleSigninClick = () => {
+    const button = document.getElementById("signin-button");
+    button.classList.add("swirl-effect");
+    setTimeout(() => {
+      navigate("/Signin");
+    }, 500);
+  };
 
   return (
     <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
@@ -29,7 +37,7 @@ const Navbar = () => {
         <h1 className="text-xl font-bold text-green-600">SecondHandStore</h1>
       </div>
 
-      <div className="flex-grow flex justify-center">
+      <div className="hidden md:flex flex-grow justify-center">
         <ul className="flex space-x-6 text-[18px]">
           <li>
             <NavLink
@@ -48,6 +56,10 @@ const Navbar = () => {
             </NavLink>
           </li>
         </ul>
+      </div>
+
+      <div className="flex-grow flex justify-center">
+        <SearchBar products={products} />
       </div>
 
       <div className="relative flex-grow flex justify-end space-x-3 ml-25">
@@ -74,11 +86,13 @@ const Navbar = () => {
             )}
           </div>
         ) : (
-          <NavLink to="/Signin">
-            <button className="bg-green-600 text-white py-2 rounded-lg w-22 cursor-pointer border-2 border-transparent hover:bg-white hover:text-green-600 hover:border-green-600 box-border">
-              Sign in
-            </button>
-          </NavLink>
+          <button
+            id="signin-button"
+            onClick={handleSigninClick}
+            className="bg-green-600 text-white py-2 rounded-lg w-22 cursor-pointer border-2 border-transparent hover:bg-white hover:text-green-600 hover:border-green-600 box-border"
+          >
+            Sign in
+          </button>
         )}
       </div>
     </nav>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import googleLogo from "../assets/google-logo.png";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -29,9 +29,18 @@ const Login = () => {
       });
   }
 
+  const handleSignupClick = (e) => {
+    e.preventDefault();
+    const link = document.getElementById("signup-link");
+    link.classList.add("active");
+    setTimeout(() => {
+      navigate("/signup");
+    }, 500);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-600">
-      <div className="bg-white flex flex-col rounded-lg shadow-lg overflow-hidden max-w-md w-full p-10">
+    <div className="flex items-center justify-center min-h-screen bg-green-600 p-4">
+      <div className="bg-white flex flex-col rounded-lg shadow-lg overflow-hidden max-w-md w-full p-6 sm:p-10">
         <h2 className="text-2xl font-bold text-black mb-2 text-center">Log In</h2>
         <p className="text-black mb-6 text-center">Welcome back! Please enter your details.</p>
 
@@ -54,10 +63,13 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)} 
             />
           </div>
-          <div className="flex justify-between text-sm mb-6">
-            <a href="#" className="text-green-600">Forgot password?</a>
+          <div className="flex justify-between text-sm mb-6 mt-3">
+            <a href="#" className="text-green-600 hover:text-red-600 transition-colors duration-300">Forgot password?</a>
           </div>
-          <button type="submit" className="w-full bg-green-700 text-white py-3 rounded-lg">
+          <button
+            type="submit"
+            className="w-full bg-green-700 text-white py-3 rounded-lg transition-all duration-300 ease-in-out transform hover:bg-red-800 hover:scale-105 hover:shadow-lg active:scale-95 cursor-pointer"
+          >
             Log in
           </button>
         </form>
@@ -74,7 +86,14 @@ const Login = () => {
 
         <p className="text-sm text-center text-gray-500 mt-4">
           Don't have an account?
-          <Link to="/signup" className="text-green-800 underline"> Sign up</Link>
+          <a
+            id="signup-link"
+            href="/signup"
+            onClick={handleSignupClick}
+            className="text-green-800 underline hover:text-red-600 transition-colors duration-300 green-drop-effect"
+          >
+            Sign up
+          </a>
         </p>
       </div>
     </div>
