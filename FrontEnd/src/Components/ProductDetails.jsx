@@ -19,10 +19,16 @@ const ProductDetails = () => {
       setLoading(true);
       setError(null);
 
+      const isFake = id.startsWith("fake-");
+      const productId = isFake ? id.replace("fake-", "") : id;
+      const url = isFake
+        ? `https://api.escuelajs.co/api/v1/products/${productId}`
+        : `http://localhost:8081/product/${productId}`;
+
       try {
-        const res = await axios.get(`http://localhost:8081/product/${id}`);
+        const res = await axios.get(url);
         setProduct(res.data);
-        checkIfWishlisted(id);
+        if (!isFake) checkIfWishlisted(productId); // Wishlist only for real products
       } catch (err) {
         console.error("Error fetching product details:", err);
         setError("Failed to load product details.");
@@ -86,7 +92,7 @@ const ProductDetails = () => {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!product) return <p>Product not found</p>;
 
-  const images = product.images || [product.image_url];
+  const images = Array.isArray(product.images) ? product.images : [product.image || product.image_url];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -122,26 +128,30 @@ const ProductDetails = () => {
 
         {/* Product Details */}
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800">{product.title}</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{product.title || product.name}</h2>
           <p className="text-gray-600 mt-1">
             Condition: <span className="font-medium">{product.condition || "N/A"}</span>
           </p>
           <p className="text-gray-600 mt-1">
             Category: <span className="font-medium">{product.category?.name || "N/A"}</span>
           </p>
-          <p className="text-green-600 text-2xl font-semibold mt-3">₹{product.price}</p>
+          <p className="text-green-600 text-2xl font-semibold mt-3">
+            ₹{product.price || product.price?.toFixed(2)}
+          </p>
 
           {/* Buttons: Wishlist & Contact Seller */}
           <div className="mt-4 flex space-x-4">
-            <button
-              className={`flex-1 py-2 rounded-lg font-semibold shadow transition ${
-                isWishlisted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
-              onClick={handleAddToWishlist}
-              disabled={isWishlisted}
-            >
-              {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
-            </button>
+            {!id.startsWith("fake-") && (
+              <button
+                className={`flex-1 py-2 rounded-lg font-semibold shadow transition ${
+                  isWishlisted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+                onClick={handleAddToWishlist}
+                disabled={isWishlisted}
+              >
+                {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
+              </button>
+            )}
 
             <button
               className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-green-700 transition"
@@ -152,7 +162,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Contact Seller Options */}
-          {showContactOptions && (
+          {showContactOptions && !id.startsWith("fake-") && (
             <div className="mt-3 p-4 bg-gray-200 rounded-lg shadow-md">
               <p className="font-semibold">Choose how to contact the seller:</p>
               <div className="flex space-x-4 mt-2">
@@ -170,6 +180,10 @@ const ProductDetails = () => {
                 </button>
               </div>
             </div>
+          )}
+
+          {id.startsWith("fake-") && (
+            <p className="mt-4 text-gray-500 text-center">This is a demo product from EscuelaJS API.</p>
           )}
         </div>
       </div>
