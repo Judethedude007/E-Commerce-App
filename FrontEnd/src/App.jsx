@@ -9,6 +9,9 @@ import Login from "./Components/Login";
 import ProductDetails from "./Components/ProductDetails"; 
 import EditProduct from "./Components/editproduct";
 import ProductListing from "./Components/Productlisting";
+import Wishlist from "./Components/wishlist";
+
+
 
 const App = () => {
   const location = useLocation();
@@ -35,6 +38,7 @@ const App = () => {
         <Route path="/Login" element={<Login setUser={setUser} />} />
         <Route path="/edit-product/:productId" element={<EditProduct />} />
         <Route path="/product/:id" element={<ProductDetails />} /> 
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </>
   );

@@ -9,13 +9,16 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  const username = localStorage.getItem("username"); // Get logged-in username
 
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
 
-      const isFake = id.startsWith("fake-"); // Check if it's a fake product
+      const isFake = id.startsWith("fake-"); 
       const productId = isFake ? id.replace("fake-", "") : id;
       const url = isFake
         ? `https://api.escuelajs.co/api/v1/products/${productId}`
@@ -24,6 +27,7 @@ const ProductDetails = () => {
       try {
         const res = await axios.get(url);
         setProduct(res.data);
+        checkIfWishlisted(productId);
       } catch (err) {
         console.error("Error fetching product details:", err);
         setError("Failed to load product details.");
@@ -35,12 +39,43 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
+  const checkIfWishlisted = async (productId) => {
+    if (!username) return;
+    try {
+      const res = await axios.get(`http://localhost:8081/wishlist/${username}`);
+      const wishlistedProducts = res.data.map((item) => item.product_id);
+      setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
+    } catch (error) {
+      console.error("Error checking wishlist status:", error);
+    }
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!username) {
+      alert("Please log in to add items to your wishlist.");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:8081/iwishlist", {
+        username,
+        product_id: id,
+      });
+
+      setIsWishlisted(true);
+      alert("Item added to wishlist!");
+    } catch (error) {
+      console.error("Error adding item to wishlist:", error);
+      alert("Failed to add item to wishlist.");
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
   if (!product) return <p>Product not found</p>;
 
   const images = product.images || [product.image_url];
-  const sellerContact = product.seller_contact || "Not available"; // Handling missing seller info
+  const sellerContact = product.seller_contact || "Not available"; 
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -74,8 +109,14 @@ const ProductDetails = () => {
           <p className="text-green-600 text-2xl font-semibold mt-3">₹{product.price}</p>
 
           <div className="mt-4 flex space-x-4">
-            <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
-              Add to Wishlist
+            <button
+              className={`flex-1 py-2 rounded-lg font-semibold shadow transition ${
+                isWishlisted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+              onClick={handleAddToWishlist}
+              disabled={isWishlisted}
+            >
+              {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
             </button>
             <button
               className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-green-700 transition"

@@ -2,12 +2,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 import SearchBar from "./SearchBar";
+import { FaHeart } from "react-icons/fa"; // Importing Wishlist icon
 
 const Navbar = ({ products }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [isOpen, setIsOpen] = useState(false); 
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
@@ -22,9 +23,10 @@ const Navbar = ({ products }) => {
   function handleLogout() {
     localStorage.removeItem("username");
     setUsername("");
-    setIsOpen(false); 
+    setIsOpen(false);
     navigate("/login");
   }
+
   const handleSigninClick = () => {
     const button = document.getElementById("signin-button");
     button.classList.add("swirl-effect");
@@ -61,18 +63,22 @@ const Navbar = ({ products }) => {
       </div>
 
       <div className="flex-grow flex justify-center">
-       <SearchBar 
-        products={products} 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        setFilteredProducts={setFilteredProducts} 
-       />
+        <SearchBar
+          products={products}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          setFilteredProducts={setFilteredProducts}
+        />
       </div>
 
-      <div className="relative flex-grow flex justify-end space-x-3 ml-25">
+      {/* Wishlist Icon */}
+      <div className="flex items-center space-x-4">
+        <NavLink to="/wishlist" className="text-gray-700 hover:text-green-600 text-2xl">
+          <FaHeart />
+        </NavLink>
+
         {username ? (
-          <div className="flex items-center space-x-4">
-            {/* Circular Avatar with First Letter */}
+          <div className="relative">
             <div
               className="w-10 h-10 flex items-center justify-center bg-green-600 text-white font-bold rounded-full cursor-pointer"
               onClick={() => setIsOpen(!isOpen)}
@@ -80,9 +86,15 @@ const Navbar = ({ products }) => {
               {username.charAt(0).toUpperCase()}
             </div>
 
-            {/* Dropdown Menu */}
             {isOpen && (
-              <div className="absolute right-0 mr-3 mt-22 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
+              <div className="absolute right-0 mr-3 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
+                <NavLink
+                  to="/dashboard"
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </NavLink>
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"
