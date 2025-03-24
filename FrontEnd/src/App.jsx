@@ -6,7 +6,9 @@ import Sellitems from "./pages/Sellitems";
 import Signin from "./pages/Signin";
 import Signup from "./Components/Signup";
 import Login from "./Components/Login";
-import ProductDetails from "./Components/ProductDetails"; // Import ProductDetails
+import ProductDetails from "./Components/ProductDetails"; 
+import EditProduct from "./Components/editproduct";
+import ProductListing from "./Components/Productlisting";
 
 const App = () => {
   const location = useLocation();
@@ -29,8 +31,10 @@ const App = () => {
         <Route path="/Sellitems" element={<Sellitems />} />
         <Route path="/Signin" element={<Signin setUser={setUser} />} />
         <Route path="/Signup" element={<Signup setUser={setUser} />} />
+        <Route path="/create-listing" element={<ProductListing />} />
         <Route path="/Login" element={<Login setUser={setUser} />} />
-        <Route path="/product/:id" element={<ProductDetails />} /> {/* Add product details route */}
+        <Route path="/edit-product/:productId" element={<EditProduct />} />
+        <Route path="/product/:id" element={<ProductDetails />} /> 
       </Routes>
     </>
   );

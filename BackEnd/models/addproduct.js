@@ -6,9 +6,11 @@ const router = express.Router();
 
 router.post('/', upload.single('image'), (req, res) => {
     const { user_id, title, condition, location, price, category } = req.body;
+    console.log("Received request body:", req.body);
+    console.log("Received file:", req.file);
     if (!user_id || !title || !price) return res.status(400).json({ error: 'User ID, title, and price are required' });
     
-    // First look up the user_id from the username
+    
     const getUserIdQuery = "SELECT id FROM project.login WHERE username = ?";
     authDB.query(getUserIdQuery, [user_id], (err, results) => {
         if (err) {
@@ -25,7 +27,7 @@ router.post('/', upload.single('image'), (req, res) => {
         
         console.log("Inserting product with userId:", userId, "imageUrl:", imageUrl);
         
-        // Make sure this matches your table structure exactly
+    
         const insertProduct = "INSERT INTO products (user_id, title, `condition`, location, price, category, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
         const values = [userId, title, condition, location, price, category, imageUrl];
         

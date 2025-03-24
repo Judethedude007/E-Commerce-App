@@ -18,8 +18,17 @@ app.use("/products", productRouter);
 import addproductRouter from "./models/addproduct.js";
 app.use("/add-product", addproductRouter);
 
-import productDetailsRouter from "./models/productDetails.js";  // Added Product Details Route
-app.use("/product", productDetailsRouter);  // Added Route for Fetching Product by ID
+import productDetailsRouter from "./models/productDetails.js";  
+app.use("/product", productDetailsRouter);  
+
+import userproductRouter from "./models/userproduct.js";
+app.use("/user-products", userproductRouter);
+
+import dproductRouter from "./models/delete.js";
+app.use("/delete-item", dproductRouter);
+
+import eproductRouter from "./models/edit.js";
+app.use("/update-item", eproductRouter);
 
 app.listen(8081, () => {
     console.log(" Server running on port 8081");
