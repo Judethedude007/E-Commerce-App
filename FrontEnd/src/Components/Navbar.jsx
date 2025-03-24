@@ -3,88 +3,63 @@ import { useEffect, useState } from "react";
 import "./Navbar.css";
 import SearchBar from "./SearchBar";
 
-const Navbar = ({ products }) => {
+const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [isOpen, setIsOpen] = useState(false); 
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    if (storedUsername && storedUsername !== "undefined" && storedUsername !== "null") {
-      setUsername(storedUsername);
-    } else {
-      setUsername("");
-    }
+    setUser(localStorage.getItem("username") || null);
   }, []);
 
-  function handleLogout() {
+  const handleLogout = () => {
     localStorage.removeItem("username");
-    setUsername("");
-    setIsOpen(false); 
+    setUser(null);
+    setIsOpen(false);
     navigate("/login");
-  }
+  };
+
   const handleSigninClick = () => {
-    const button = document.getElementById("signin-button");
-    button.classList.add("swirl-effect");
-    setTimeout(() => {
-      navigate("/Signin");
-    }, 500);
+    document.getElementById("signin-button").classList.add("swirl-effect");
+    setTimeout(() => navigate("/Signin"), 500);
   };
 
   return (
     <nav className="bg-white fixed top-0 left-0 z-50 shadow-md py-3 px-6 flex items-center w-full">
       <div className="flex-grow flex justify-start">
-        <h1 className="text-xl font-bold text-green-600">SecondHandStore</h1>
+        <h1 className="text-2xl font-bold text-green-600">SecondHandStore</h1>
       </div>
 
-      <div className="hidden md:flex flex-grow justify-center">
-        <ul className="flex space-x-6 text-[18px]">
+      <div className="hidden md:flex flex-grow justify-center mr-20">
+        <ul className="flex space-x-6 text-[20px]">
           <li>
-            <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}
-            >
+            <NavLink to="/" className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}>
               Home
             </NavLink>
           </li>
           <li>
-            <NavLink
-              to="/Sellitems"
-              className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}
-            >
+            <NavLink to="/Sellitems" className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}>
               Sell Items
             </NavLink>
           </li>
         </ul>
       </div>
 
-      <div className="flex-grow flex justify-center">
-       <SearchBar 
-        products={products} 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        setFilteredProducts={setFilteredProducts} 
-       />
-      </div>
+      
 
-      <div className="relative flex-grow flex justify-end space-x-3 ml-25">
-        {username ? (
+      <div className="relative flex-grow flex justify-end space-x-3">
+        {user ? (
           <div className="flex items-center space-x-4">
-            {/* Circular Avatar with First Letter */}
-            <div
-              className="w-10 h-10 flex items-center justify-center bg-green-600 text-white font-bold rounded-full cursor-pointer"
+            <div 
+              className="w-13 h-13 flex items-center justify-center bg-green-600 text-white text-xl font-bold rounded-full cursor-pointer"
               onClick={() => setIsOpen(!isOpen)}
             >
-              {username.charAt(0).toUpperCase()}
+              {user.charAt(0).toUpperCase()}
             </div>
 
-            {/* Dropdown Menu */}
             {isOpen && (
-              <div className="absolute right-0 mr-3 mt-22 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
-                <button
-                  onClick={handleLogout}
+              <div className="absolute right-0 mr-3 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
+                <button 
+                  onClick={handleLogout} 
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"
                 >
                   Logout
