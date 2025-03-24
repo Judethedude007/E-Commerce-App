@@ -8,14 +8,23 @@ const Sellitems = () => {
   const [userProducts, setUserProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
+  const [error, setError] = useState(null);
 
-  // Get username from localStorage
+  
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
-    if (storedUsername) setUsername(storedUsername);
+    console.log("Username from localStorage:", storedUsername);
+    
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else {
+      console.warn("No username found in localStorage");
+      setLoading(false); 
+      setError("User not logged in. Please log in to view your listings.");
+    }
   }, []);
 
-  // Fetch user's products
+  
   useEffect(() => {
     if (!username) return;
     
@@ -37,8 +46,7 @@ const Sellitems = () => {
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:8081/products/${productId}`);
-        // Update the list by removing the deleted product
+        await axios.delete(`http://localhost:8081/delete-item/${productId}`);
         setUserProducts(userProducts.filter(product => product.id !== productId));
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -52,9 +60,13 @@ const Sellitems = () => {
   };
 
   const handleCreateListing = () => {
-    navigate("/Create-listing");
+    if (!username) {
+      alert("You need to log in to create a listing.");
+      navigate("/login"); 
+    } else {
+      navigate("/Create-listing"); 
+    }
   };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-4xl">
