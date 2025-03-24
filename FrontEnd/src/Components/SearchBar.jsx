@@ -1,5 +1,5 @@
-import searchIcon from "../assets/2946467-200.png";
 import { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa"; // Import X icon from react-icons
 
 const SearchBar = ({ products = [], setFilteredProducts = () => {} }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,10 +18,15 @@ const SearchBar = ({ products = [], setFilteredProducts = () => {} }) => {
     }
   }, [searchTerm, products, setFilteredProducts]);
 
-  const handleSelectProduct = (product) => {
-    setSearchTerm(product.title); // Keep search input visible
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setFilteredProducts(products);
+    setFilteredList([]);
+  };
+
+  const handleSelectProduct = (title) => {
+    setSearchTerm(title); // Set input value
     setFilteredList([]); // Hide dropdown
-    document.activeElement.blur(); // Remove focus from input
   };
 
   return (
@@ -30,14 +35,20 @@ const SearchBar = ({ products = [], setFilteredProducts = () => {} }) => {
         <input
           type="text"
           placeholder="Search"
-          className="p-2 text-sm sm:text-xl text-white bg-black rounded-l-2xl border-none focus:outline-none w-full h-full"
+          className="pl-4 text-sm sm:text-xl text-white bg-black rounded-2xl border-none focus:outline-none w-full h-full"
           spellCheck="false"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button className="p-2 bg-green-600 text-white rounded-r-2xl hover:bg-green-700 hover:scale-110 transition-all duration-300 focus:outline-none h-full w-10 sm:w-16 flex items-center justify-center">
-          <img src={searchIcon} alt="Search" className="w-6 sm:w-8 h-6 sm:h-8" />
-        </button>
+        
+        {searchTerm && (
+          <button
+            onClick={handleClearSearch}
+            className="p-2 bg-green-600 text-white rounded-r-2xl hover:bg-green-700 hover:scale-110 transition-all duration-300 focus:outline-none h-full w-10 sm:w-16 flex items-center justify-center"
+          >
+            <FaTimes size={20} />
+          </button>
+        )}
       </div>
 
       {searchTerm && filteredList.length > 0 && (
@@ -46,7 +57,7 @@ const SearchBar = ({ products = [], setFilteredProducts = () => {} }) => {
             <li
               key={p.id}
               className="p-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleSelectProduct(p)}
+              onClick={() => handleSelectProduct(p.title)}
             >
               {p.title}
             </li>

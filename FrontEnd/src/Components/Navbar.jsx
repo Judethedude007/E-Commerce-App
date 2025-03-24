@@ -32,7 +32,7 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
       </div>
 
       <div className="hidden md:flex flex-grow justify-center mr-20">
-        <ul className="flex space-x-6 text-[20px]">
+        <ul className="flex space-x-6 text-[20px] mr-70">
           <li>
             <NavLink to="/" className={({ isActive }) => (isActive ? "text-green-600" : "text-gray-700")}>
               Home

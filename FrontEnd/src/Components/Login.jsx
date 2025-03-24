@@ -16,7 +16,6 @@ const Login = () => {
       .then(response => {
         console.log(response.data);
         if (response.data.message) {
-          alert("Login Successful");
           localStorage.setItem("username", response.data.user.username);
           navigate("/");
         } else {
