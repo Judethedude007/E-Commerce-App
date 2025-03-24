@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
-import SearchBar from "./SearchBar";
 
 const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
   const navigate = useNavigate();
