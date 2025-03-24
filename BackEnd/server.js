@@ -30,6 +30,18 @@ app.use("/delete-item", dproductRouter);
 import eproductRouter from "./models/edit.js";
 app.use("/update-item", eproductRouter);
 
+import wproductRouter from "./models/wishlist.js";
+app.use("/wishlist", wproductRouter);
+
+import dwproductRouter from "./models/dwishlist.js";
+app.use("/dwishlist", dwproductRouter);
+
+import iwproductRouter from "./models/iwishlist.js";
+app.use("/iwishlist", iwproductRouter);
+
+import emailRouter from "./models/email.js";
+app.use("/email", emailRouter);
+
 app.listen(8081, () => {
     console.log(" Server running on port 8081");
 });

@@ -1,10 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
+import { FaHeart } from "react-icons/fa"; // Importing Wishlist icon
+import SearchBar from "./SearchBar"; // Ensure you have imported SearchBar
 
 const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // ✅ Fix: Declare searchTerm state
 
   useEffect(() => {
     setUser(localStorage.getItem("username") || null);
@@ -12,7 +15,7 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("username");
-    setUser(null);
+    setUser(null); // ✅ Fix: Use setUser instead of setUsername
     setIsOpen(false);
     navigate("/login");
   };
@@ -43,13 +46,16 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
         </ul>
       </div>
 
-      
+      {/* Wishlist Icon */}
+      <div className="flex items-center space-x-4">
+        <NavLink to="/wishlist" className="text-gray-700 hover:text-green-600 text-2xl">
+          <FaHeart />
+        </NavLink>
 
-      <div className="relative flex-grow flex justify-end space-x-3">
-        {user ? (
-          <div className="flex items-center space-x-4">
-            <div 
-              className="w-13 h-13 flex items-center justify-center bg-green-600 text-white text-xl font-bold rounded-full cursor-pointer"
+        {user ? ( // ✅ Fix: Use `user` instead of `username`
+          <div className="relative">
+            <div
+              className="w-10 h-10 flex items-center justify-center bg-green-600 text-white font-bold rounded-full cursor-pointer"
               onClick={() => setIsOpen(!isOpen)}
             >
               {user.charAt(0).toUpperCase()}
@@ -57,8 +63,15 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
 
             {isOpen && (
               <div className="absolute right-0 mr-3 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
-                <button 
-                  onClick={handleLogout} 
+                <NavLink
+                  to="/dashboard"
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </NavLink>
+                <button
+                  onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"
                 >
                   Logout

@@ -10,6 +10,7 @@ import ProductDetails from "./Components/ProductDetails";
 import EditProduct from "./Components/editproduct";
 import ProductListing from "./Components/Productlisting";
 import ProductSection from "./Components/ProductSection"; 
+import Wishlist from "./Components/wishlist"; // ✅ Ensure correct import
 
 const App = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const App = () => {
             />
           }
         />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </>
   );
