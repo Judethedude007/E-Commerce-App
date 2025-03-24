@@ -11,7 +11,7 @@ const ProductSection = () => {
     setLoading(true);
     setError(null);
 
-    // Fetch products from your local API
+   
     const localProducts = axios.get("http://localhost:8081/products")
       .then(res => res.data.products)
       .catch(err => {
@@ -19,7 +19,7 @@ const ProductSection = () => {
         return [];
       });
 
-    // Fetch products from Fake Store API
+    
     const fakeStoreProducts = fetch("https://api.escuelajs.co/api/v1/products")
       .then(res => res.json())
       .then(data => {
@@ -38,7 +38,7 @@ const ProductSection = () => {
         return [];
       });
 
-    // Wait for both requests to complete and combine results
+   
     Promise.all([localProducts, fakeStoreProducts])
       .then(([local, fakeStore]) => {
         const combined = [...local, ...fakeStore];
@@ -71,7 +71,6 @@ const ProductSection = () => {
 
 
   return (
-<<<<<<< HEAD
     <div className="container mx-auto px-20 py-12">
       <h2 className="text-3xl font-bold mb-6 text-center">Available Products</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
@@ -95,28 +94,9 @@ const ProductSection = () => {
                 Contact Seller
               </button>
             </div>
-=======
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-      {products.map((product) => (
-        <div key={product.id} className="p-6 bg-white rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-2xl hover:-translate-y-2 hover:bg-gray-100">
-          <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-t-lg" />
-          <h3 className="text-lg font-medium transition-colors duration-300 hover:text-green-700">
-            {product.name}
-          </h3>
-          <div className="flex justify-between items-center text-sm mt-2">
-            <p className="text-green-600 font-semibold transition-transform duration-300 hover:scale-105">
-              {product.price}
-            </p>
-            <p className="text-gray-500 transition-opacity duration-300 hover:opacity-75">
-              Posted {product.posted}
-            </p>
->>>>>>> a223c61c317b5bd8c4b52bdaf7b83bdc82e7d9a7
           </div>
-          <button className="mt-3 w-full bg-green-600 text-white py-2 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-800 hover:scale-110 hover:shadow-2xl hover:cursor-pointer">
-            Contact Seller
-          </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

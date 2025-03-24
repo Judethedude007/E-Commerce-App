@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import "./Navbar.css";
 import SearchBar from "./SearchBar";
 
-const Navbar = () => {
+const Navbar = ({ products }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [isOpen, setIsOpen] = useState(false); // Dropdown state
+  const [isOpen, setIsOpen] = useState(false); 
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -59,7 +61,12 @@ const Navbar = () => {
       </div>
 
       <div className="flex-grow flex justify-center">
-        <SearchBar products={products} />
+       <SearchBar 
+        products={products} 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        setFilteredProducts={setFilteredProducts} 
+       />
       </div>
 
       <div className="relative flex-grow flex justify-end space-x-3 ml-25">

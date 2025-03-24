@@ -9,11 +9,12 @@ const SearchBar = ({ products }) => {
     const term = event.target.value;
     setSearchTerm(term);
     setFilteredProducts(
-      products.filter((p) =>
-        p.name.toLowerCase().includes(term.toLowerCase())
+      (products || []).filter((p) =>
+        p.name?.toLowerCase().includes(term.toLowerCase())
       )
     );
   };
+  
 
   return (
     <div className="flex items-center w-full max-w-md z-10 rounded-2xl shadow-xl transition-all duration-300 p-2">
