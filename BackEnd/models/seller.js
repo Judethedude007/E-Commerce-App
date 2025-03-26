@@ -8,15 +8,16 @@ router.get("/:id", async (req, res) => {
 
     try {
         const query = `
-    SELECT 
-        p.*, 
-        l.email AS seller_email  
-    FROM 
-        products p
-    JOIN 
-        login l ON p.user_id = l.id  -- If login table has 'id' instead of 'user_id'
-    WHERE 
-        p.id = ?`;
+        SELECT 
+            p.*, 
+            l.email AS seller_email,
+            l.username AS seller_name 
+        FROM 
+            products p
+        JOIN 
+            login l ON p.user_id = l.id  
+        WHERE 
+            p.id = ?`;
 
         productDB.query(query, [id], (err, results) => {
             if (err) {
@@ -28,9 +29,10 @@ router.get("/:id", async (req, res) => {
                 return res.status(404).json({ message: "Product not found" });
             }
 
-            res.json(results[0]); 
+            res.json(results[0]);
         });
     } catch (error) {
+        console.error("Unexpected server error:", error);
         res.status(500).json({ message: "Unexpected server error" });
     }
 });

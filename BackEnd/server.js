@@ -23,6 +23,8 @@ app.use("/product", productDetailsRouter);
 
 import userproductRouter from "./models/userproduct.js";
 app.use("/user-products", userproductRouter);
+import sellerproductRouter from "./models/sellerproduct.js";
+app.use("/seller-products", sellerproductRouter);
 
 import dproductRouter from "./models/delete.js";
 app.use("/delete-item", dproductRouter);
@@ -39,8 +41,14 @@ app.use("/dwishlist", dwproductRouter);
 import iwproductRouter from "./models/iwishlist.js";
 app.use("/iwishlist", iwproductRouter);
 
-import emailRouter from "./models/email.js";
-app.use("/email", emailRouter);
+import sellerRouter from "./models/seller.js";
+app.use("/seller", sellerRouter);
+
+import sellerprofileRouter from "./models/seller-profile.js";
+app.use("/seller-profile", sellerprofileRouter);
+
+import rsellerRouter from "./models/rate.js";
+app.use("/rate-seller", rsellerRouter);
 
 app.listen(8081, () => {
     console.log(" Server running on port 8081");

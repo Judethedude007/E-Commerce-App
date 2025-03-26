@@ -10,7 +10,8 @@ import ProductDetails from "./Components/ProductDetails";
 import EditProduct from "./Components/editproduct";
 import ProductListing from "./Components/Productlisting";
 import ProductSection from "./Components/ProductSection"; 
-import Wishlist from "./Components/wishlist"; // ✅ Ensure correct import
+import Wishlist from "./Components/wishlist"; 
+import UserProfile from "./Components/seller";
 
 const App = () => {
   const location = useLocation();
@@ -58,6 +59,8 @@ const App = () => {
           }
         />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/user-profile/:userId" element={<UserProfile />} />
+
       </Routes>
     </>
   );
