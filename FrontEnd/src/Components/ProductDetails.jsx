@@ -1,16 +1,16 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Mail } from "lucide-react";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [showContactOptions, setShowContactOptions] = useState(false);
 
   const username = localStorage.getItem("username");
 
@@ -28,9 +28,8 @@ const ProductDetails = () => {
       try {
         const res = await axios.get(url);
         setProduct(res.data);
-        if (!isFake) checkIfWishlisted(productId); // Wishlist only for real products
+        if (!isFake) checkIfWishlisted(productId);
       } catch (err) {
-        console.error("Error fetching product details:", err);
         setError("Failed to load product details.");
       } finally {
         setLoading(false);
@@ -66,7 +65,6 @@ const ProductDetails = () => {
       setIsWishlisted(true);
       alert("Item added to wishlist!");
     } catch (error) {
-      console.error("Error adding item to wishlist:", error);
       alert("Failed to add item to wishlist.");
     }
   };
@@ -83,8 +81,7 @@ const ProductDetails = () => {
 
       window.location.href = `mailto:${sellerEmail}?subject=Interest in ${product.title}`;
     } catch (error) {
-      console.error("Error fetching seller email:", error);
-      alert("Failed to fetch seller email. Please try again.");
+      alert("Failed to fetch seller email.");
     }
   };
 
@@ -94,96 +91,82 @@ const ProductDetails = () => {
 
   const images = Array.isArray(product.images) ? product.images : [product.image || product.image_url];
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-4">
+      {/* Home Button - Positioned Properly */}
+      <div className="w-full max-w-4xl">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:bg-green-700 transition"
+        >
+          Home
+        </button>
+      </div>
+
+      {/* Product Card */}
+      <div className="max-w-4xl w-full bg-white shadow-xl rounded-lg overflow-hidden mt-4">
         {/* Image Carousel */}
-        <div className="relative w-full h-80 bg-gray-200">
+        <div className="relative w-full h-96 bg-gray-200">
           {images.length > 1 && (
             <button
-              onClick={prevImage}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full"
+              onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} />
             </button>
           )}
           <img src={images[currentImageIndex]} alt={product.title} className="w-full h-full object-cover" />
           {images.length > 1 && (
             <button
-              onClick={nextImage}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full"
+              onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} />
             </button>
           )}
         </div>
 
         {/* Product Details */}
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800">{product.title || product.name}</h2>
-          <p className="text-gray-600 mt-1">
-            Condition: <span className="font-medium">{product.condition || "N/A"}</span>
+          <h2 className="text-3xl font-bold text-gray-800">{product.title || product.name}</h2>
+          <p className="text-gray-600 mt-2">
+            <span className="font-semibold">Condition:</span> {product.condition || "N/A"}
           </p>
           <p className="text-gray-600 mt-1">
-            Category: <span className="font-medium">{product.category?.name || "N/A"}</span>
+            <span className="font-semibold">Category:</span> {product.category || "N/A"}
           </p>
-          <p className="text-green-600 text-2xl font-semibold mt-3">
+          <p className="text-green-600 text-3xl font-bold mt-3">
             ₹{product.price || product.price?.toFixed(2)}
           </p>
 
           {/* Buttons: Wishlist & Contact Seller */}
-          <div className="mt-4 flex space-x-4">
+          <div className="mt-5 flex space-x-4">
             {!id.startsWith("fake-") && (
               <button
-                className={`flex-1 py-2 rounded-lg font-semibold shadow transition ${
-                  isWishlisted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+                className={`flex-1 py-3 rounded-lg font-semibold shadow-md text-lg flex items-center justify-center space-x-2 transition ${
+                  isWishlisted
+                    ? "bg-green-800 text-white cursor-not-allowed"
+                    : "bg-green-700 hover:bg-green-800 text-white cursor-pointer"
                 }`}
                 onClick={handleAddToWishlist}
                 disabled={isWishlisted}
               >
-                {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
+                <Heart size={20} />
+                <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
               </button>
             )}
 
             <button
-              className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-green-700 transition"
-              onClick={() => setShowContactOptions(!showContactOptions)}
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg cursor-pointer font-semibold shadow-md text-lg flex items-center justify-center space-x-2 hover:bg-blue-700 transition"
+              onClick={handleEmailSeller}
             >
-              Contact Seller
+              <Mail size={20} />
+              <span>Email Seller</span>
             </button>
           </div>
 
-          {/* Contact Seller Options */}
-          {showContactOptions && !id.startsWith("fake-") && (
-            <div className="mt-3 p-4 bg-gray-200 rounded-lg shadow-md">
-              <p className="font-semibold">Choose how to contact the seller:</p>
-              <div className="flex space-x-4 mt-2">
-                <button
-                  className="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600 transition"
-                  onClick={handleEmailSeller}
-                >
-                  Email Seller
-                </button>
-                <button
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
-                  onClick={() => alert("Message feature coming soon!")}
-                >
-                  Message Seller
-                </button>
-              </div>
-            </div>
-          )}
-
           {id.startsWith("fake-") && (
-            <p className="mt-4 text-gray-500 text-center">This is a demo product from EscuelaJS API.</p>
+            <p className="mt-4 text-gray-500 text-center italic">This is a demo product from EscuelaJS API.</p>
           )}
         </div>
       </div>

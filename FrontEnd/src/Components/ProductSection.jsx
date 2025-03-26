@@ -106,14 +106,14 @@ const ProductSection = () => {
                   </h3>
 
                   <div className="flex justify-between items-center mt-1">
-                    <p className="text-green-600 font-semibold">₹{product.price}</p>
+                    <p className="text-gray-900 font-semibold">₹{product.price}</p>
                     <p className="text-gray-500 text-sm truncate" title={product.category}>
                       <span className="font-semibold text-gray-600">Category:</span> {product.category}
                     </p>
                   </div>
 
-                  <button className="mt-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
-                    Contact Seller
+                  <button className="mt-2 bg-gray-900 text-white py-2 rounded-lg hover:bg-green-700">
+                    View Details
                   </button>
                 </div>
               </Link>

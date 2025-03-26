@@ -5,7 +5,18 @@ import cloudinary from "../config/cloudinary.js";
 const router = express.Router();
 
 router.post('/', upload.single('image'), (req, res) => {
-    const { user_id, title, condition, location, price, category } = req.body;
+  const {
+    user_id,
+    title,
+    description = "",
+    condition = "",
+    location = "",
+    price = "",
+    category = "",
+    used_time = "",
+    used_years = "",
+    contact_number = "",
+  } = req.body;
     console.log("Received request body:", req.body);
     console.log("Received file:", req.file);
     if (!user_id || !title || !price) return res.status(400).json({ error: 'User ID, title, and price are required' });
@@ -28,8 +39,10 @@ router.post('/', upload.single('image'), (req, res) => {
         console.log("Inserting product with userId:", userId, "imageUrl:", imageUrl);
         
     
-        const insertProduct = "INSERT INTO products (user_id, title, `condition`, location, price, category, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        const values = [userId, title, condition, location, price, category, imageUrl];
+        const insertProduct = `INSERT INTO products 
+    (user_id, title, description, \`condition\`, location, contact_number, price, category, used_time, used_years, image_url, created_at, updated_at) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+const values = [userId, title, description, condition, location, contact_number, price, category, used_time, used_years, imageUrl];
         
         productDB.query(insertProduct, values, (err, result) => {
             if (err) {

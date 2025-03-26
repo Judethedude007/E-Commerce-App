@@ -52,7 +52,7 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
           <FaHeart />
         </NavLink>
 
-        {user ? ( // ✅ Fix: Use `user` instead of `username`
+        {user ? ( 
           <div className="relative">
             <div
               className="w-10 h-10 flex items-center justify-center bg-green-600 text-white font-bold rounded-full cursor-pointer"
@@ -63,13 +63,7 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
 
             {isOpen && (
               <div className="absolute right-0 mr-3 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
-                <NavLink
-                  to="/dashboard"
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Dashboard
-                </NavLink>
+                
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"
