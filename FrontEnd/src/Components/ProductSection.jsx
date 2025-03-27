@@ -21,11 +21,11 @@ const ProductSection = () => {
       try {
         setLoading(true);
         setError(null);
-
+  
         const localProducts = await axios.get("http://localhost:8081/products")
-          .then((res) => res.data.products)
+          .then((res) => res.data.products.filter(product => product.sale_status !== 1)) // Exclude sold products
           .catch(() => []);
-
+  
         const fakeStoreProducts = await fetch("https://api.escuelajs.co/api/v1/products")
           .then((res) => res.json())
           .then((data) => data.map((item) => ({
@@ -38,9 +38,10 @@ const ProductSection = () => {
             used_time: 0,
             used_years: "days",
             location: "Unknown",
+            sale_status: 0, // Fake store products are always unsold
           })))
           .catch(() => []);
-
+  
         const allProducts = [...localProducts, ...fakeStoreProducts];
         setProducts(allProducts);
         setFilteredProducts(allProducts);
@@ -50,10 +51,10 @@ const ProductSection = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProducts();
-  }, []);
-
+  }, []);  
+  
   useEffect(() => {
     let filtered = [...products];
 

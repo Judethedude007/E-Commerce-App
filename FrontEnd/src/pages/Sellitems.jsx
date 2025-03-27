@@ -10,24 +10,18 @@ const Sellitems = () => {
   const [username, setUsername] = useState("");
   const [error, setError] = useState(null);
 
-  
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
-    console.log("Username from localStorage:", storedUsername);
-    
     if (storedUsername) {
       setUsername(storedUsername);
     } else {
-      console.warn("No username found in localStorage");
-      setLoading(false); 
+      setLoading(false);
       setError("User not logged in. Please log in to view your listings.");
     }
   }, []);
 
-  
   useEffect(() => {
     if (!username) return;
-    
     const fetchUserProducts = async () => {
       try {
         setLoading(true);
@@ -39,7 +33,6 @@ const Sellitems = () => {
         setLoading(false);
       }
     };
-
     fetchUserProducts();
   }, [username]);
 
@@ -49,7 +42,6 @@ const Sellitems = () => {
         await axios.delete(`http://localhost:8081/delete-item/${productId}`);
         setUserProducts(userProducts.filter(product => product.id !== productId));
       } catch (error) {
-        console.error("Error deleting product:", error);
         alert("Failed to delete product");
       }
     }
@@ -62,11 +54,12 @@ const Sellitems = () => {
   const handleCreateListing = () => {
     if (!username) {
       alert("You need to log in to create a listing.");
-      navigate("/login"); 
+      navigate("/login");
     } else {
-      navigate("/Create-listing"); 
+      navigate("/Create-listing");
     }
   };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-4xl">
@@ -91,17 +84,22 @@ const Sellitems = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {userProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow p-4 flex">
-                <div className="w-24 h-24 mr-4">
+              <div key={product.id} className="relative bg-white rounded-lg shadow p-4 flex">
+                <div className="w-24 h-24 mr-4 relative">
                   <img 
                     src={product.image_url} 
                     alt={product.title} 
                     className="w-full h-full object-cover rounded"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = "/placeholder-image.jpg"; // Fallback image
+                      e.target.src = "/placeholder-image.jpg"; 
                     }}
                   />
+                  {product.sale_status === 1 && (
+                    <span className="absolute bottom-0 left-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded">
+                      Sold
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-lg">{product.title}</h3>

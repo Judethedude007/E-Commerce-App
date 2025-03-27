@@ -50,9 +50,14 @@ const UserProfile = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow p-4 flex">
+            <div 
+              key={product.id} 
+              className={`relative bg-white rounded-lg shadow p-4 flex ${product.sale_status === 1 ? "opacity-50" : ""}`}
+            >
+              {/* SOLD Badge */}
+
               {/* Product Image */}
-              <div className="w-24 h-24 mr-4">
+              <div className="w-24 h-24 mr-4 relative">
                 <img 
                   src={product.image_url} 
                   alt={product.title} 
@@ -65,11 +70,19 @@ const UserProfile = () => {
               </div>
 
               {/* Product Info */}
-              <div className="flex-1">
+              <div className="flex-1 ">
                 <h3 className="font-bold text-lg">{product.title}</h3>
                 <p className="text-green-600 font-semibold">₹{product.price}</p>
                 <p className="text-sm text-gray-500">{product.condition} • {product.location}</p>
-                <a href={`/product/${product.id}`} className="text-blue-500 hover:underline">View Product</a>
+                {product.sale_status === 1 ? (
+                  <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded z-10">
+                  SOLD
+                </span>
+                ) : (
+                  <a href={`/product/${product.id}`} className="text-blue-500 hover:underline">
+                    View Product
+                  </a>
+                )}
               </div>
             </div>
           ))}

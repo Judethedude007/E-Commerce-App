@@ -218,6 +218,7 @@ const ProductDetails = () => {
                     <p className="text-gray-600 mt-1">
                         <span className="font-semibold">Category:</span> {product.category || "N/A"}
                     </p>
+                    <p className="text-gray-600"><span className="font-semibold">Used for:</span> {product.used_time || ""} {product.used_years || "N/A"}</p>
                     <p className="text-green-600 text-3xl font-bold mt-3">
                         ₹{product.price || product.price?.toFixed(2)}
                     </p>
