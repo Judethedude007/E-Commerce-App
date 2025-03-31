@@ -52,9 +52,9 @@ const ProductListing = () => {
     formDataToSend.append("condition", formData.condition);
     formDataToSend.append("location", formData.location);
     formDataToSend.append("price", formData.price);
-    formDataToSend.append("category", formData.category);
-    formDataToSend.append("used_time", formData.used_time); // renamed
-    formDataToSend.append("used_years", formData.used_years); // renamed
+    formDataToSend.append("category", formData.category || "General");
+    formDataToSend.append("used_time", formData.used_time);
+    formDataToSend.append("used_years", formData.used_years);
     formDataToSend.append("contact_number", formData.contact_number);
     formDataToSend.append("image", formData.image);
 
@@ -71,8 +71,8 @@ const ProductListing = () => {
                 location: "",
                 price: "",
                 category: "",
-                used_time: "",  // renamed
-                used_years: "", // renamed
+                used_time: "",
+                used_years: "",
                 contact_number: "",
                 image: null,
                 description: "",
@@ -103,7 +103,7 @@ const ProductListing = () => {
         <div className="flex flex-col gap-4">
           <input type="text" name="title" placeholder="Product Name" className="border p-2 rounded-lg" onChange={handleChange} value={formData.title} />
            <input type="text" name="description" placeholder="Description" className="border p-2 rounded-lg" onChange={handleChange} value={formData.description} />
-          <input type="text" name="condition" placeholder="Condition (New/Used)" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
+          <input type="text" name="condition" placeholder="Brand" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
           <input type="text" name="location" placeholder="Location" className="border p-2 rounded-lg" onChange={handleChange} value={formData.location} />
           <input type="number" name="price" placeholder="Enter Price" className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
 

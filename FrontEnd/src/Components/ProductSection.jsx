@@ -109,7 +109,13 @@ const ProductSection = () => {
     }
   }, [location, products]);
 
-  if (loading) return <div className="text-center text-xl">Loading products...</div>;
+  if (loading) {
+    return (
+        <div className="min-h-screen flex justify-center items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+    );
+}
   if (error) return <div className="text-center text-red-500 text-xl">{error}</div>;
 
   return (

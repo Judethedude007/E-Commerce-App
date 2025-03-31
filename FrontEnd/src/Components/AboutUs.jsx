@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Users, ShoppingBag, Star, TrendingUp, Target, Leaf } from "lucide-react";
+import { Users, ShoppingBag, Star, TrendingUp } from "lucide-react";
 
 const AboutUs = () => {
     const [stats, setStats] = useState({
@@ -101,43 +101,13 @@ const AboutUs = () => {
                     </div>
                 </div>
 
-                {/* Mission and Vision Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                    {/* Mission Statement */}
-                    <div className="bg-white rounded-lg shadow-sm p-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <Target className="w-8 h-8 text-green-600 mr-3" />
-                            Our Mission
-                        </h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            To provide a trusted platform where people can buy and sell quality pre-owned items 
-                            at fair prices. We aim to extend the lifecycle of products, reduce waste, and make 
-                            sustainable shopping accessible to everyone. By connecting sellers with buyers, we 
-                            create opportunities for both economic savings and environmental conservation.
-                        </p>
-                    </div>
-
-                    {/* Vision Statement */}
-                    <div className="bg-white rounded-lg shadow-sm p-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <Leaf className="w-8 h-8 text-blue-600 mr-3" />
-                            Our Vision
-                        </h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            To revolutionize the way people think about second-hand shopping by creating 
-                            the most trusted and user-friendly marketplace for pre-owned items. We envision 
-                            a world where buying second-hand becomes the first choice for conscious consumers, 
-                            leading to significant reductions in waste and environmental impact while building 
-                            a strong, sustainable community.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Values Section */}
+                {/* Mission Statement */}
                 <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Values</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
                     <p className="text-gray-600 max-w-3xl mx-auto">
-                        We value sustainability, affordability, and trust. These principles guide our platform and community.
+                        We're committed to creating a sustainable marketplace where quality second-hand items find new homes. 
+                        Our platform empowers sellers to give their items a second life while offering buyers affordable alternatives. 
+                        Together, we're building a community that values sustainability, affordability, and trust.
                     </p>
                 </div>
             </div>

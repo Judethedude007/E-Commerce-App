@@ -22,7 +22,6 @@ router.get('/', (req, res) => {
             console.error("Database error:", err);
             return res.status(500).json({ error: 'Failed to fetch products', details: err });
         }
-        console.log("Products fetched:", data.length);
         return res.json({ products: data });
     });
 });
