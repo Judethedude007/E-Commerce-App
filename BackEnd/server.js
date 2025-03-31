@@ -50,6 +50,9 @@ app.use("/seller-profile", sellerprofileRouter);
 import rsellerRouter from "./models/rate.js";
 app.use("/rate-seller", rsellerRouter);
 
+import statsRouter from "./models/stats.js";
+app.use("/stats", statsRouter);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
