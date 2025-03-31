@@ -22,9 +22,11 @@ const ProductSection = () => {
         setLoading(true);
         setError(null);
   
-        const localProducts = await axios.get("http://localhost:8081/products")
-          .then((res) => res.data.products.filter(product => product.sale_status !== 1)) // Exclude sold products
-          .catch(() => []);
+        const localProductsResponse = await axios.get("http://localhost:8081/products");
+        console.log("Local products response:", localProductsResponse.data);
+        
+        const localProducts = localProductsResponse.data.products || [];
+        console.log("Local products:", localProducts);
   
         const fakeStoreProducts = await fetch("https://api.escuelajs.co/api/v1/products")
           .then((res) => res.json())
@@ -38,14 +40,22 @@ const ProductSection = () => {
             used_time: 0,
             used_years: "days",
             location: "Unknown",
-            sale_status: 0, // Fake store products are always unsold
+            sale_status: 0,
+            seller_name: "Fake Store",
+            seller_rating: 0,
+            total_ratings: 0
           })))
-          .catch(() => []);
+          .catch((error) => {
+            console.error("Error fetching fake store products:", error);
+            return [];
+          });
   
         const allProducts = [...localProducts, ...fakeStoreProducts];
+        console.log("All products:", allProducts);
         setProducts(allProducts);
         setFilteredProducts(allProducts);
-      } catch {
+      } catch (error) {
+        console.error("Error in fetchProducts:", error);
         setError("Failed to load products.");
       } finally {
         setLoading(false);
@@ -170,20 +180,69 @@ const ProductSection = () => {
                 key={product.id}
                 to={`/product/${product.id}`}
                 state={{ product }}
-                className="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer flex flex-col h-[295px]"
+                className="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer flex flex-col h-[380px] hover:shadow-lg transition-shadow"
               >
-                <img src={product.image_url} alt={product.title} className="w-full h-40 object-cover" />
-                <div className="p-4 flex flex-col flex-grow">
-                  <h3 className="text-lg font-medium truncate" title={product.title}>{product.title}</h3>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="text-gray-900 font-semibold">₹{product.price}</p>
-                    <p className="text-gray-500 text-sm truncate" title={product.category}>
-                      <span className="font-semibold text-gray-600">Category:</span> {product.category}
-                    </p>
+                <div className="relative w-full h-[160px]">
+                  <img 
+                    src={product.image_url} 
+                    alt={product.title} 
+                    className="w-full h-full object-cover"
+                  />
+                  {product.sale_status === 1 && (
+                    <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded">
+                      Sold
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col h-[220px] p-4">
+                  <div className="flex-1 min-h-0">
+                    {/* Title and Price Row */}
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-medium truncate flex-1 mr-3" title={product.title}>
+                        {product.title}
+                      </h3>
+                      <p className="text-xl font-bold text-green-600 whitespace-nowrap">₹{product.price}</p>
+                    </div>
+
+                    {/* Location and Category Row */}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium w-[70px]">Used for:</span>
+                      <span className="truncate">{product.used_time || "0"} {product.used_years || "N/A"}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {product.category}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium w-[70px]">Location:</span>
+                      <span className="truncate max-w-[150px]">{product.location || "N/A"}</span>
+                      </div>
+
+                      {String(product.id).startsWith('fake-') ? null : (
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center text-gray-600">
+                            <span className="font-medium w-[70px]">Seller:</span>
+                            <span className="truncate max-w-[100px]">{product.seller_name}</span>
+                          </div>
+                          <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-xs">
+                            <span className="text-yellow-500 mr-1">⭐</span>
+                            <span>{product.seller_rating.toFixed(1)}</span>
+                            <span className="text-gray-500 ml-1">({product.total_ratings})</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <button className="mt-2 bg-gray-900 text-white py-2 rounded-lg hover:bg-green-700">
-                    View Details
-                  </button>
+
+                  <div className="pt-3">
+                    <button className="w-full bg-gray-900 text-white py-2.5 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                      View Details
+                    </button>
+                  </div>
                 </div>
               </Link>
             ))

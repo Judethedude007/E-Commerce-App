@@ -175,121 +175,210 @@ const ProductDetails = () => {
     const images = Array.isArray(product.images) ? product.images : [product.image || product.image_url];
 
     return (
-        <div className="flex flex-col items-center min-h-screen bg-gray-100 p-4">
-            {/* Home Button */}
-            <div className="w-full max-w-4xl">
-                <button
-                    onClick={() => navigate("/")}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:bg-green-700 transition"
-                >
-                    Home
-                </button>
+        <div className="min-h-screen bg-gray-50">
+            {/* Navigation Bar */}
+            <div className="bg-white shadow-sm sticky top-0 z-10">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <button
+                        onClick={() => navigate("/")}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-2" />
+                        Back to Home
+                    </button>
+                </div>
             </div>
 
-            {/* Product Card */}
-            <div className="max-w-4xl w-full bg-white shadow-xl rounded-lg overflow-hidden mt-4">
-                {/* Image Carousel */}
-                <div className="relative w-full h-96 bg-gray-200">
-                    {images.length > 1 && (
-                        <button
-                            onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black"
-                        >
-                            <ChevronLeft size={28} />
-                        </button>
-                    )}
-                    <img src={images[currentImageIndex]} alt={product.title} className="w-full h-full object-cover" />
-                    {images.length > 1 && (
-                        <button
-                            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black"
-                        >
-                            <ChevronRight size={28} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Product Details */}
-                <div className="p-6">
-                    <h2 className="text-3xl font-bold text-gray-800">{product.title || product.name}</h2>
-                    <p className="text-gray-600 mt-2">
-                        <span className="font-semibold">Condition:</span> {product.condition || "N/A"}
-                    </p>
-                    <p className="text-gray-600 mt-1">
-                        <span className="font-semibold">Category:</span> {product.category || "N/A"}
-                    </p>
-                    <p className="text-gray-600"><span className="font-semibold">Used for:</span> {product.used_time || ""} {product.used_years || "N/A"}</p>
-                    <p className="text-green-600 text-3xl font-bold mt-3">
-                        ₹{product.price || product.price?.toFixed(2)}
-                    </p>
-
-                    {/* Wishlist & Contact Seller Buttons */}
-                    <div className="mt-5 flex space-x-4">
-                        {!id.startsWith("fake-") && (
-                            <button
-                                className={`flex-1 py-3 rounded-lg font-semibold shadow-md text-lg flex items-center justify-center space-x-2 transition ${isWishlisted
-                                    ? "bg-green-800 text-white cursor-not-allowed"
-                                    : "bg-green-700 hover:bg-green-800 text-white cursor-pointer"
-                                    }`}
-                                onClick={handleAddToWishlist}
-                                disabled={isWishlisted}
-                            >
-                                <Heart size={20} />
-                                <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
-                            </button>
-                        )}
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
                     </div>
+                ) : error ? (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                        {error}
+                    </div>
+                ) : !product ? (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
+                        Product not found
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Left Column - Images */}
+                        <div className="space-y-4">
+                            {/* Main Image */}
+                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                                <div className="relative aspect-square">
+                                    <img 
+                                        src={images[currentImageIndex]} 
+                                        alt={product.title} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                    {images.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+                                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
+                                            >
+                                                <ChevronLeft size={24} />
+                                            </button>
+                                            <button
+                                                onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
+                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
+                                            >
+                                                <ChevronRight size={24} />
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
 
-                    {/* Seller Profile */}
-                    <div className="mt-8 border-t pt-4">
-                        <h3 className="text-xl font-semibold text-gray-700">Seller Profile</h3>
-                        <p className="text-gray-800 font-semibold">Name: {product?.seller_name}</p>
-                        <p className="text-gray-500 text-sm">Email: {product?.seller_email}</p>
-                       
-
-                        {/* Contact Options */}
-                        <div className="flex mt-4 space-x-4">
-
-                            <button
-                                onClick={handleEmailSeller}
-                                className="flex items-center justify-center px-4 py-2 border rounded-lg text-blue-600 hover:bg-blue-50 transition"
-                            >
-                                <Mail size={16} className="mr-2" /> Email
-                            </button>
-                            <button
-                                onClick={handleWhatsAppSeller}
-                                className="flex items-center justify-center px-4 py-2 border rounded-lg text-green-600 hover:bg-green-50 transition"
-                            >
-                                <Phone size={16} className="mr-2" /> WhatsApp
-                            </button>
-                        </div>
-
-                        {/* Rating Area */}
-                        <div className="mt-8 border-t pt-4">
-                            {showRating && (
-                                <>
-                                    <h4 className="text-lg font-semibold text-gray-700">Rate the Seller:</h4>
-                                    <div className="flex items-center mt-2">
-                                        {renderStars()}
+                            {/* Thumbnail Grid */}
+                            {images.length > 1 && (
+                                <div className="grid grid-cols-4 gap-2">
+                                    {images.map((image, index) => (
                                         <button
-                                            onClick={sendRatingToBackend}
-                                            className="ml-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                                            key={index}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+                                                currentImageIndex === index 
+                                                    ? 'border-green-500' 
+                                                    : 'border-transparent hover:border-gray-300'
+                                            }`}
                                         >
-                                            Submit Rating
+                                            <img 
+                                                src={image} 
+                                                alt={`${product.title} - Image ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
                                         </button>
-                                    </div>
-                                </>
+                                    ))}
+                                </div>
                             )}
                         </div>
 
-                        <button
-                            onClick={() => navigate(`/user-profile/${product.user_id}`)}
-                            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                        >
-                            View Seller Profile
-                        </button>
+                        {/* Right Column - Product Details */}
+                        <div className="space-y-6">
+                            {/* Product Info */}
+                            <div className="bg-white rounded-lg shadow-sm p-6">
+                                <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.title}</h1>
+                                
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-2xl font-bold text-green-600">₹{product.price?.toFixed(2)}</span>
+                                        {product.condition && (
+                                            <span className="px-2 py-1 text-sm bg-gray-100 text-gray-600 rounded-full">
+                                                {product.condition}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {!id.startsWith("fake-") && (
+                                        <button
+                                            onClick={handleAddToWishlist}
+                                            disabled={isWishlisted}
+                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+                                                isWishlisted
+                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-green-600 text-white hover:bg-green-700'
+                                            }`}
+                                        >
+                                            <Heart size={20} className={isWishlisted ? 'fill-current' : ''} />
+                                            <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="space-y-4 mb-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Category</p>
+                                            <p className="font-medium">{product.category || "N/A"}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Used For</p>
+                                            <p className="font-medium">{product.used_time || ""} {product.used_years || "N/A"}</p>
+                                        </div>
+                                    </div>
+                                    {product.description && (
+                                        <div>
+                                            <p className="text-sm text-gray-500">Description</p>
+                                            <p className="font-medium whitespace-pre-wrap">{product.description}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Seller Info */}
+                            <div className="bg-white rounded-lg shadow-sm p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                            <span className="text-xl font-semibold text-gray-600">
+                                                {product?.seller_name?.[0]?.toUpperCase() || 'S'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-gray-900">{product?.seller_name || "Unknown Seller"}</h3>
+                                            <div className="flex items-center space-x-2">
+                                                <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
+                                                    <span className="text-yellow-500 mr-1">⭐</span>
+                                                    <span className="font-medium">{product?.seller_rating || "0.0"}</span>
+                                                    <span className="text-gray-500 ml-1">({product?.total_ratings || 0})</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => navigate(`/user-profile/${product.user_id}`)}
+                                                    className="text-sm text-blue-600 hover:text-blue-800"
+                                                >
+                                                    View Profile
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <button
+                                        onClick={handleEmailSeller}
+                                        className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
+                                    >
+                                        <Mail className="w-5 h-5 text-gray-400 group-hover:text-blue-500 mr-2" />
+                                        <span className="font-medium">Contact via Email</span>
+                                    </button>
+                                    <button
+                                        onClick={handleWhatsAppSeller}
+                                        className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
+                                    >
+                                        <Phone className="w-5 h-5 text-gray-400 group-hover:text-green-500 mr-2" />
+                                        <span className="font-medium">Contact via WhatsApp</span>
+                                    </button>
+                                </div>
+
+                                {/* Rating Section */}
+                                {showRating && (
+                                    <div className="border-t pt-6">
+                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Rate this Seller</h4>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                {renderStars()}
+                                                <span className="text-sm text-gray-500">
+                                                    {selectedRating > 0 ? `${selectedRating} out of 5` : 'Select rating'}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={sendRatingToBackend}
+                                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                                                disabled={selectedRating === 0}
+                                            >
+                                                Submit Rating
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

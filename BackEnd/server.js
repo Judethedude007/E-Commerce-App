@@ -50,6 +50,12 @@ app.use("/seller-profile", sellerprofileRouter);
 import rsellerRouter from "./models/rate.js";
 app.use("/rate-seller", rsellerRouter);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
 app.listen(8081, () => {
-    console.log(" Server running on port 8081");
+    console.log("Server running on port 8081");
 });
