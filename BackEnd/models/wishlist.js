@@ -1,9 +1,8 @@
-
 import express from "express";
-import {productDB} from "./database.js";
-
+import { productDB } from "./database.js";
 
 const router = express.Router();
+
 router.get('/:username', (req, res) => {
     const username = req.params.username;
     console.log("Fetching user ID for:", username);
@@ -25,9 +24,15 @@ router.get('/:username', (req, res) => {
             const userId = result[0].id;
             console.log("User ID found:", userId);
 
-            // Fetch wishlist items for the user
+            // Fetch full product details along with sale_status
             productDB.query(
-                `SELECT p.id AS product_id, p.title, p.price, p.image_url, p.location 
+                `SELECT 
+                    p.id AS product_id, 
+                    p.title, 
+                    p.price, 
+                    p.image_url, 
+                    p.location, 
+                    p.sale_status  -- Include sale_status
                  FROM wishlist w 
                  JOIN products p ON w.product_id = p.id 
                  WHERE w.user_id = ?`,
@@ -45,4 +50,5 @@ router.get('/:username', (req, res) => {
         }
     );
 });
+
 export default router;

@@ -60,7 +60,7 @@ const AboutUs = () => {
                     {/* Total Users */}
                     <div className="bg-white rounded-lg shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-medium text-gray-900">Active Users</h3>
+                            <h3 className="text-lg font-medium text-gray-900">Active Sellers</h3>
                             <Users className="w-6 h-6 text-green-600" />
                         </div>
                         <p className="text-3xl font-bold text-gray-900">{stats.totalUsers}</p>
