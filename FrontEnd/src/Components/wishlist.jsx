@@ -51,32 +51,21 @@ const Wishlist = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {wishlist.map((item) => (
-            <div key={item.product_id} className="relative">
-              <Link to={`/product/${item.product_id}`} className="block">
-                <div className="relative bg-white/80 backdrop-blur-md shadow-lg p-5 rounded-xl border border-gray-200 hover:shadow-xl transition-all">
-                  <img
-                    src={item.image_url || "https://via.placeholder.com/300"}
-                    alt={item.title}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+            <div key={item.product_id} className={`relative ${item.sale_status === 1 ? "opacity-50" : ""}`}>
+              {item.sale_status === 1 && (
+                <span className="absolute top-2 left-2 z-10 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">
+                  SOLD
+                </span>
+              )}
 
-                  <div className="flex items-center justify-between mt-3">
-                    <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeFromWishlist(item.product_id);
-                      }}
-                      className="text-red-500 hover:text-red-600 transition mr-2"
-                    >
-                      <FaTrash size={18} />
-                    </button>
-                  </div>
-
-                  <p className="text-sm text-gray-500">Location: {item.location}</p>
-                  <p className="text-lg font-bold text-green-600 mt-1">₹{item.price}</p>
-                </div>
-              </Link>
+              {/* Only allow clicking if the item is not sold */}
+              {item.sale_status !== 1 ? (
+                <Link to={`/product/${item.product_id}`} className="block">
+                  <WishlistItem item={item} removeFromWishlist={removeFromWishlist} />
+                </Link>
+              ) : (
+                <WishlistItem item={item} removeFromWishlist={removeFromWishlist} />
+              )}
             </div>
           ))}
         </div>
@@ -84,5 +73,31 @@ const Wishlist = () => {
     </div>
   );
 };
+
+const WishlistItem = ({ item, removeFromWishlist }) => (
+  <div className="relative bg-white/80 backdrop-blur-md shadow-lg p-5 rounded-xl border border-gray-200 hover:shadow-xl transition-all">
+    <img
+      src={item.image_url || "https://via.placeholder.com/300"}
+      alt={item.title}
+      className="w-full h-48 object-cover rounded-lg"
+    />
+
+    <div className="flex items-center justify-between mt-3">
+      <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          removeFromWishlist(item.product_id);
+        }}
+        className="text-red-500 hover:text-red-600 transition mr-2"
+      >
+        <FaTrash size={18} />
+      </button>
+    </div>
+
+    <p className="text-sm text-gray-500">Location: {item.location}</p>
+    <p className="text-lg font-bold text-green-600 mt-1">₹{item.price}</p>
+  </div>
+);
 
 export default Wishlist;

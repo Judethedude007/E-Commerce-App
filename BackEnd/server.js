@@ -1,5 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import googleAuth from "./auth/googleAuth.js"; // Updated path
+import dotenv from "dotenv";
+
+dotenv.config(); // Load .env variables
 
 const app = express();
 
@@ -53,6 +57,8 @@ app.use("/rate-seller", rsellerRouter);
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
 
+app.use("/auth/google", googleAuth);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
@@ -60,5 +66,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(8081, () => {
-    console.log("Server running on port 8081");
+    console.log("Server running on http://localhost:8081");
 });

@@ -73,8 +73,15 @@ const ProductDetails = () => {
         if (!username) return;
         try {
             const res = await axios.get(`http://localhost:8081/wishlist/${username}`);
-            const wishlistedProducts = res.data.map((item) => item.product_id);
-            setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
+            const wishlistedProducts = res.data.map((item) => ({
+                ...item,
+                isSold: item.sale_status === 1, // Add `isSold` flag based on sale_status
+            }));
+            setIsWishlisted(wishlistedProducts.some((item) => item.product_id === parseInt(productId)));
+            setProduct((prev) => ({
+                ...prev,
+                isSold: wishlistedProducts.some((item) => item.product_id === parseInt(productId) && item.isSold),
+            }));
         } catch (error) {
             console.error("Error checking wishlist status:", error);
         }
@@ -340,17 +347,23 @@ const ProductDetails = () => {
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <button
                                         onClick={handleEmailSeller}
-                                        className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
+                                        className={`flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 ${
+                                            product?.isSold ? "cursor-not-allowed opacity-50" : "hover:bg-red-100 hover:text-red-600"
+                                        } transition group`}
+                                        disabled={product?.isSold}
                                     >
-                                        <Mail className="w-5 h-5 text-gray-400 group-hover:text-blue-500 mr-2" />
-                                        <span className="font-medium">Contact via Email</span>
+                                        <Mail className={`w-5 h-5 text-gray-400 ${product?.isSold ? "" : "group-hover:text-red-600"} mr-2`} />
+                                        <span className="font-medium">{product?.isSold ? "Sold" : "Contact via Email"}</span>
                                     </button>
                                     <button
                                         onClick={handleWhatsAppSeller}
-                                        className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
+                                        className={`flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 ${
+                                            product?.isSold ? "cursor-not-allowed opacity-50" : "hover:bg-green-100 hover:text-green-600"
+                                        } transition group`}
+                                        disabled={product?.isSold}
                                     >
-                                        <Phone className="w-5 h-5 text-gray-400 group-hover:text-green-500 mr-2" />
-                                        <span className="font-medium">Contact via WhatsApp</span>
+                                        <Phone className={`w-5 h-5 text-gray-400 ${product?.isSold ? "" : "group-hover:text-green-600"} mr-2`} />
+                                        <span className="font-medium">{product?.isSold ? "Sold" : "Contact via WhatsApp"}</span>
                                     </button>
                                 </div>
 
