@@ -23,10 +23,7 @@ const ProductSection = () => {
         setError(null);
   
         const localProductsResponse = await axios.get("http://localhost:8081/products");
-        console.log("Local products response:", localProductsResponse.data);
-        
         const localProducts = localProductsResponse.data.products || [];
-        console.log("Local products:", localProducts);
   
         const fakeStoreProducts = await fetch("https://api.escuelajs.co/api/v1/oducts")
           .then((res) => res.json())
@@ -50,8 +47,28 @@ const ProductSection = () => {
             return [];
           });
   
-        const allProducts = [...localProducts, ...fakeStoreProducts];
-        console.log("All products:", allProducts);
+        // Fetch seller details for local products
+        const productsWithSellerDetails = await Promise.all(localProducts.map(async (product) => {
+          try {
+            const sellerResponse = await axios.get(`http://localhost:8081/product/${product._id}`);
+            return {
+              ...product,
+              seller_name: sellerResponse.data.seller_name || "Unknown Seller",
+              seller_rating: sellerResponse.data.seller_rating || 0,
+              total_ratings: sellerResponse.data.total_ratings || 0
+            };
+          } catch (error) {
+            console.error("Error fetching seller details:", error);
+            return {
+              ...product,
+              seller_name: "Unknown Seller",
+              seller_rating: 0,
+              total_ratings: 0
+            };
+          }
+        }));
+  
+        const allProducts = [...productsWithSellerDetails, ...fakeStoreProducts];
         setProducts(allProducts);
         setFilteredProducts(allProducts);
       } catch (error) {
@@ -232,12 +249,12 @@ const ProductSection = () => {
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center text-gray-600">
                             <span className="font-medium w-[70px]">Seller:</span>
-                            <span className="truncate max-w-[100px]">{product.seller_name}</span>
+                            <span className="truncate max-w-[100px]">{product.seller_name || "Unknown Seller"}</span>
                           </div>
                           <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-xs">
                             <span className="text-yellow-500 mr-1">⭐</span>
-                            <span>{product.seller_rating.toFixed(1)}</span>
-                            <span className="text-gray-500 ml-1">({product.total_ratings})</span>
+                            <span>{Number(product.seller_rating || 0).toFixed(1)}</span>
+                            <span className="text-gray-500 ml-1">({product.total_ratings || 0})</span>
                           </div>
                         </div>
                       )}

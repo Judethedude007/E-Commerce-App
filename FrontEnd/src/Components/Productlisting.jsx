@@ -45,20 +45,36 @@ const ProductListing = () => {
         return;
     }
 
+    // Validate required fields
+    if (!formData.title || !formData.price) {
+        alert("Please fill in all required fields (Title and Price)");
+        return;
+    }
+
     const formDataToSend = new FormData();
     formDataToSend.append("user_id", username);
     formDataToSend.append("title", formData.title);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("condition", formData.condition);
-    formDataToSend.append("location", formData.location);
+    formDataToSend.append("description", formData.description || "");
+    formDataToSend.append("condition", formData.condition || "");
+    formDataToSend.append("location", formData.location || "");
     formDataToSend.append("price", formData.price);
     formDataToSend.append("category", formData.category || "General");
-    formDataToSend.append("used_time", formData.used_time);
-    formDataToSend.append("used_years", formData.used_years);
-    formDataToSend.append("contact_number", formData.contact_number);
-    formDataToSend.append("image", formData.image);
+    formDataToSend.append("used_time", formData.used_time || "");
+    formDataToSend.append("used_years", formData.used_years || "");
+    formDataToSend.append("contact_number", formData.contact_number || "");
+    
+    if (formData.image) {
+        formDataToSend.append("image", formData.image);
+    }
 
     try {
+        console.log("Sending form data:", {
+            user_id: username,
+            title: formData.title,
+            price: formData.price,
+            hasImage: !!formData.image
+        });
+
         const res = await axios.post("http://localhost:8081/add-product", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         });
@@ -81,8 +97,12 @@ const ProductListing = () => {
             navigate("/");
         }
     } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to list product.");
+        console.error("Error details:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
+        alert(`Failed to list product: ${error.response?.data?.error || error.message}`);
     }
 };
 

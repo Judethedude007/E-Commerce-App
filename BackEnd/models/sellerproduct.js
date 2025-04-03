@@ -11,12 +11,19 @@ router.get("/:id", async (req, res) => {
     try {
         const collections = await getCollections();
         
-        // Convert userId string to ObjectId
-        const userObjectId = new ObjectId(userId);
+        // Try to convert to ObjectId first
+        let userQuery;
+        try {
+            const objectId = new ObjectId(userId);
+            userQuery = { user_id: objectId };
+        } catch (error) {
+            // If not a valid ObjectId, try numeric ID
+            userQuery = { user_id: parseInt(userId) };
+        }
         
         // Query to fetch products based on user ID
         const products = await collections.products
-            .find({ user_id: userObjectId })
+            .find(userQuery)
             .toArray();
         
         console.log("Query Result:", products);

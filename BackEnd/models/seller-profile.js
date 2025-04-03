@@ -11,14 +11,32 @@ router.get("/:id", async (req, res) => {
     try {
         const collections = await getCollections();
         
-        // Convert id string to ObjectId
-        const sellerObjectId = new ObjectId(id);
-        
-        // Get seller information
-        const seller = await collections.users.findOne(
-            { _id: sellerObjectId },
-            { projection: { username: 1, email: 1 } }
+        // First try to find by username
+        let seller = await collections.users.findOne(
+            { username: id },
+            { projection: { username: 1, email: 1, _id: 1 } }
         );
+        
+        // If not found by username, try numeric ID
+        if (!seller) {
+            seller = await collections.users.findOne(
+                { id: parseInt(id) },
+                { projection: { username: 1, email: 1, _id: 1 } }
+            );
+        }
+        
+        // If still not found, try ObjectId
+        if (!seller) {
+            try {
+                const sellerObjectId = new ObjectId(id);
+                seller = await collections.users.findOne(
+                    { _id: sellerObjectId },
+                    { projection: { username: 1, email: 1, _id: 1 } }
+                );
+            } catch (error) {
+                console.error("Invalid ObjectId format:", error);
+            }
+        }
         
         if (!seller) {
             return res.status(404).json({ error: "Seller not found" });
@@ -27,7 +45,7 @@ router.get("/:id", async (req, res) => {
         // Get rating information
         const ratingAgg = await collections.ratings
             .aggregate([
-                { $match: { seller_id: sellerObjectId } },
+                { $match: { seller_id: seller._id } },
                 { $group: {
                     _id: null,
                     average_rating: { $avg: "$rating" },

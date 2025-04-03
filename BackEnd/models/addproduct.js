@@ -20,25 +20,28 @@ router.post('/', upload.single('image'), async (req, res) => {
       contact_number = "",
     } = req.body;
     
-    console.log("Received request body:", req.body);
-    console.log("Received file:", req.file);
-    
     if (!user_id || !title || !price) {
       return res.status(400).json({ error: 'User ID, title, and price are required' });
     }
     
-    // Get collections
     const collections = await getCollections();
     
-    // Find the user by username
-    const user = await collections.users.findOne({ username: user_id });
+    // Try to find user by ID first
+    let user;
+    try {
+      const objectId = new ObjectId(user_id);
+      user = await collections.users.findOne({ _id: objectId });
+    } catch (error) {
+      // If not a valid ObjectId, try finding by username
+      user = await collections.users.findOne({ username: user_id });
+    }
     
     if (!user) {
       console.error("User not found:", user_id);
       return res.status(400).json({ error: 'User not found' });
     }
     
-    const imageUrl = req.file.path; // Use the Cloudinary URL
+    const imageUrl = req.file ? req.file.path : ""; // Use the Cloudinary URL if file exists
     
     console.log("Inserting product with userId:", user._id, "imageUrl:", imageUrl);
     
@@ -60,10 +63,10 @@ router.post('/', upload.single('image'), async (req, res) => {
       updated_at: new Date()
     };
     
-    // Insert the product into the database
     const result = await collections.products.insertOne(productDoc);
     
     console.log("Product inserted successfully:", result);
+    
     return res.json({ 
       message: 'Product added successfully', 
       productId: result.insertedId 

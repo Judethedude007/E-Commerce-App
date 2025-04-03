@@ -27,14 +27,23 @@ const ProductDetails = () => {
 
             try {
                 const res = await axios.get(`http://localhost:8081/product/${id}`);
-                setProduct(res.data);
-                fetchUserRating(res.data.user_id) // new function
-                if (res.data.user_id) {
-                    // fetchSellerDetails(res.data.user_id); // Fetch seller details using user_id
+                console.log("API Response:", res.data); // Debug API response
+                if (res.data) {
+                    setProduct(res.data);
+                    // Set seller information from the response
+                    console.log("Setting seller name:", res.data.seller_name); // Debug seller name
+                    setSellerName(res.data.seller_name || "Unknown Seller");
+                    setSellerEmail(res.data.seller_email || "Not Available");
+                    if (res.data.user_id) {
+                        fetchUserRating(res.data.user_id);
+                    }
+                    checkIfWishlisted(res.data.id);
+                } else {
+                    setError("Product not found");
                 }
-                checkIfWishlisted(res.data.id);
             } catch (err) {
-                setError("Failed to load product details.");
+                console.error("Error fetching product:", err);
+                setError(err.response?.data?.message || "Failed to load product details.");
             } finally {
                 setLoading(false);
             }
@@ -55,26 +64,14 @@ const ProductDetails = () => {
         }
     }
 
-    // Fetch seller's name and email from backend
-    const fetchSellerDetails = async (userId) => {
-        if (!userId) return;
-        try {
-            const res = await axios.get(`http://localhost:8081/seller/${userId}`);
-            setSellerName(res.data.seller_name || "Unknown Seller");
-            setSellerEmail(res.data.seller_email || "Not Available");
-        } catch (error) {
-            console.error("Error fetching seller details:", error);
-            setSellerName("Unknown Seller");
-            setSellerEmail("Not Available");
-        }
-    };
-
     const checkIfWishlisted = async (productId) => {
-        if (!username) return;
+        if (!username || !productId) return;
         try {
             const res = await axios.get(`http://localhost:8081/wishlist/${username}`);
-            const wishlistedProducts = res.data.map((item) => item.product_id);
-            setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
+            const wishlistedProducts = res.data.map(item => 
+                item.product_id ? item.product_id.toString() : ''
+            );
+            setIsWishlisted(wishlistedProducts.includes(productId.toString()));
         } catch (error) {
             console.error("Error checking wishlist status:", error);
         }
@@ -315,11 +312,11 @@ const ProductDetails = () => {
                                     <div className="flex items-center space-x-4">
                                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                                             <span className="text-xl font-semibold text-gray-600">
-                                                {product?.seller_name?.[0]?.toUpperCase() || 'S'}
+                                                {sellerName?.[0]?.toUpperCase() || 'S'}
                                             </span>
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">{product?.seller_name || "Unknown Seller"}</h3>
+                                            <h3 className="font-semibold text-gray-900">{sellerName || "Unknown Seller"}</h3>
                                             <div className="flex items-center space-x-2">
                                                 <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
                                                     <span className="text-yellow-500 mr-1">⭐</span>

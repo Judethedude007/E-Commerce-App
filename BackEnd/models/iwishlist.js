@@ -21,11 +21,18 @@ router.post("/", async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Convert product_id string to ObjectId
-        const productObjectId = new ObjectId(product_id);
+        // Try to convert to ObjectId first
+        let productQuery;
+        try {
+            const objectId = new ObjectId(product_id);
+            productQuery = { _id: objectId };
+        } catch (error) {
+            // If not a valid ObjectId, try numeric ID
+            productQuery = { id: parseInt(product_id) };
+        }
         
         // Check if the product exists
-        const product = await collections.products.findOne({ _id: productObjectId });
+        const product = await collections.products.findOne(productQuery);
         
         if (!product) {
             return res.status(404).json({ error: "Product not found" });
@@ -34,7 +41,7 @@ router.post("/", async (req, res) => {
         // Check if this item is already in the wishlist
         const existingItem = await collections.wishlist.findOne({
             user_id: user._id,
-            product_id: productObjectId
+            product_id: product._id || product.id
         });
 
         if (existingItem) {
@@ -44,7 +51,7 @@ router.post("/", async (req, res) => {
         // Insert wishlist entry
         await collections.wishlist.insertOne({
             user_id: user._id,
-            product_id: productObjectId,
+            product_id: product._id || product.id,
             added_at: new Date()
         });
         
