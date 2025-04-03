@@ -1,24 +1,30 @@
 import express from "express";
-import { productDB } from "./database.js";
+import { ObjectId } from "mongodb";
+import { getCollections } from "./database.js";
 
 const router = express.Router();
 
-
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
     const userId = req.params.id;
     console.log("Fetching products for User ID:", userId);
 
-    // Query to fetch products based on user ID
-    const query = "SELECT * FROM products WHERE user_id = ?";
-    productDB.query(query, [userId], (err, data) => {
-        if (err) {
-            console.error("Error fetching products:", err);
-            return res.status(500).json({ error: "Failed to fetch products", details: err });
-        }
-
-        console.log("Query Result:", data);
-        return res.json(data);
-    });
+    try {
+        const collections = await getCollections();
+        
+        // Convert userId string to ObjectId
+        const userObjectId = new ObjectId(userId);
+        
+        // Query to fetch products based on user ID
+        const products = await collections.products
+            .find({ user_id: userObjectId })
+            .toArray();
+        
+        console.log("Query Result:", products);
+        return res.json(products);
+    } catch (err) {
+        console.error("Error fetching products:", err);
+        return res.status(500).json({ error: "Failed to fetch products", details: err.message });
+    }
 });
 
 export default router;

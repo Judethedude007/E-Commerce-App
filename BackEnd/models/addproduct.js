@@ -1,58 +1,81 @@
 import express from "express";
-import { authDB, productDB } from "./database.js";
+import { getCollections } from "./database.js";
 import upload from "../middleware/multer.js";
-import cloudinary from "../config/cloudinary.js";
+import { ObjectId } from "mongodb";
+
 const router = express.Router();
 
-router.post('/', upload.single('image'), (req, res) => {
-  const {
-    user_id,
-    title,
-    description = "",
-    condition = "",
-    location = "",
-    price = "",
-    category = "",
-    used_time = "",
-    used_years = "",
-    contact_number = "",
-  } = req.body;
+router.post('/', upload.single('image'), async (req, res) => {
+  try {
+    const {
+      user_id,
+      title,
+      description = "",
+      condition = "",
+      location = "",
+      price = "",
+      category = "",
+      used_time = "",
+      used_years = "",
+      contact_number = "",
+    } = req.body;
+    
     console.log("Received request body:", req.body);
     console.log("Received file:", req.file);
-    if (!user_id || !title || !price) return res.status(400).json({ error: 'User ID, title, and price are required' });
     
+    if (!user_id || !title || !price) {
+      return res.status(400).json({ error: 'User ID, title, and price are required' });
+    }
     
-    const getUserIdQuery = "SELECT id FROM project.login WHERE username = ?";
-    authDB.query(getUserIdQuery, [user_id], (err, results) => {
-        if (err) {
-            console.error("Database error looking up user:", err);
-            return res.status(500).json({ error: 'Database error', details: err });
-        }
-        if (results.length === 0) {
-            console.error("User not found:", user_id);
-            return res.status(400).json({ error: 'User not found' });
-        }
-        
-        const userId = results[0].id;
-        const imageUrl = req.file.path; // Use the Cloudinary URL
-        
-        console.log("Inserting product with userId:", userId, "imageUrl:", imageUrl);
-        
+    // Get collections
+    const collections = await getCollections();
     
-        const insertProduct = `INSERT INTO products 
-    (user_id, title, description, \`condition\`, location, contact_number, price, category, used_time, used_years, image_url, created_at, updated_at) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-const values = [userId, title, description, condition, location, contact_number, price, category, used_time, used_years, imageUrl];
-        
-        productDB.query(insertProduct, values, (err, result) => {
-            if (err) {
-                console.error("Failed to insert product:", err);
-                return res.status(500).json({ error: 'Failed to add product', details: err });
-            }
-            console.log("Product inserted successfully:", result);
-            return res.json({ message: 'Product added successfully', productId: result.insertId });
-        });
+    // Find the user by username
+    const user = await collections.users.findOne({ username: user_id });
+    
+    if (!user) {
+      console.error("User not found:", user_id);
+      return res.status(400).json({ error: 'User not found' });
+    }
+    
+    const imageUrl = req.file.path; // Use the Cloudinary URL
+    
+    console.log("Inserting product with userId:", user._id, "imageUrl:", imageUrl);
+    
+    // Create a new product document
+    const productDoc = {
+      user_id: user._id,
+      title,
+      description,
+      condition,
+      location,
+      contact_number,
+      price,
+      category,
+      used_time,
+      used_years,
+      image_url: imageUrl,
+      sale_status: 0, // Default assuming 0 means not sold
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    
+    // Insert the product into the database
+    const result = await collections.products.insertOne(productDoc);
+    
+    console.log("Product inserted successfully:", result);
+    return res.json({ 
+      message: 'Product added successfully', 
+      productId: result.insertedId 
     });
+    
+  } catch (error) {
+    console.error("Failed to add product:", error);
+    return res.status(500).json({ 
+      error: 'Failed to add product', 
+      details: error.message 
+    });
+  }
 });
 
 export default router;

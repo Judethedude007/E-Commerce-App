@@ -1,43 +1,45 @@
 import express from 'express';
-import {authDB} from './database.js';
+import { getCollections } from './database.js';
 
 const router = express.Router();
 
+router.post('/', async (req, res) => {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+        console.log("Missing fields:", req.body);
+        return res.json({ error: "All fields are required" });
+    }
+
+    console.log("Signup request received:", req.body);
+
+    try {
+        const collections = await getCollections();
         
-        router.post('/', (req, res) => {
-        const { name, email, password } = req.body;
-    
-        if (!name || !email || !password) {
-            console.log("Missing fields:", req.body);
-            return res.json({ error: "All fields are required" });
+        // Check if email already exists
+        const existingUser = await collections.users.findOne({ email });
+        
+        if (existingUser) {
+            console.log("Email already exists:", email);
+            return res.json({ error: "Email already registered" });
         }
-    
-        console.log("Signup request received:", req.body);
-    
-        const checkEmailQuery = "SELECT * FROM `login` WHERE `email` = ?";
-        authDB.query(checkEmailQuery, [email], (err, data) => {
-            if (err) {
-                console.error("Error checking email:", err);
-                return res.json({ error: "Error checking email" });
-            }
-    
-            if (data.length > 0) {
-                console.log("Email already exists:", email);
-                return res.json({ error: "Email already registered" });
-            }
-    
-            const insertQuery = "INSERT INTO `login` (`username`, `email`, `password`) VALUES (?, ?, ?)";
-            authDB.query(insertQuery, [name, email, password], (err, result) => {
-                if (err) {
-                    console.error("Error inserting data:", err);
-                    return res.json({ error: "Signup failed" });
-                }
-                console.log("User registered successfully:", result);
-                return res.json({ message: "Signup successful" }); 
-            });
-        });
-    });
+        
+        // Insert new user
+        const newUser = {
+            username: name,
+            email,
+            password,
+            createdAt: new Date()
+        };
+        
+        const result = await collections.users.insertOne(newUser);
+        
+        console.log("User registered successfully:", result);
+        return res.json({ message: "Signup successful" });
+    } catch (err) {
+        console.error("Error inserting data:", err);
+        return res.json({ error: "Signup failed", details: err.message });
+    }
+});
 
-    
-
-    export default router;
+export default router;

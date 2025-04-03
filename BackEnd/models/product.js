@@ -1,29 +1,53 @@
-import express from "express";
-import {productDB} from "./database.js";
+import express from 'express';
+import { getCollections } from './database.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    const query = `
-        SELECT 
-            p.*,
-            l.username AS seller_name,
-            COALESCE(AVG(r.rating), 0) AS seller_rating,
-            COUNT(DISTINCT r.id) AS total_ratings
-        FROM products p
-        LEFT JOIN login l ON p.user_id = l.id
-        LEFT JOIN ratings r ON p.user_id = r.seller_id
-        WHERE p.sale_status != 1
-        GROUP BY p.id, p.title, p.description, p.price, p.category, p.condition, p.location, p.image_url, p.used_time, p.used_years, p.contact_number, p.sale_status, p.user_id, l.username
-        ORDER BY p.id DESC`;
-
-    productDB.query(query, (err, data) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.status(500).json({ error: 'Failed to fetch products', details: err });
-        }
-        return res.json({ products: data });
-    });
+router.get('/', async (req, res) => {
+    try {
+        const collections = await getCollections();
+        
+        // Get all products that are not sold
+        const products = await collections.products
+            .find({ sale_status: { $ne: 1 } })
+            .sort({ _id: -1 })
+            .toArray();
+            
+        // For each product, get the seller info and ratings
+        const productsWithDetails = await Promise.all(products.map(async (product) => {
+            // Get seller info
+            const seller = await collections.users.findOne(
+                { _id: product.user_id },
+                { projection: { username: 1 } }
+            );
+            
+            // Get seller ratings
+            const ratingsAgg = await collections.ratings
+                .aggregate([
+                    { $match: { seller_id: product.user_id } },
+                    { $group: {
+                        _id: null,
+                        avg_rating: { $avg: "$rating" },
+                        count: { $sum: 1 }
+                    }}
+                ])
+                .toArray();
+                
+            const ratingData = ratingsAgg.length > 0 ? ratingsAgg[0] : { avg_rating: 0, count: 0 };
+            
+            return {
+                ...product,
+                seller_name: seller ? seller.username : "Unknown Seller",
+                seller_rating: ratingData.avg_rating || 0,
+                total_ratings: ratingData.count || 0
+            };
+        }));
+        
+        return res.json({ products: productsWithDetails });
+    } catch (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: 'Failed to fetch products', details: err.message });
+    }
 });
 
 export default router;

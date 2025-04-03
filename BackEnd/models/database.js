@@ -1,35 +1,53 @@
-
-import mysql from "mysql";
-import dotenv from "dotenv";
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME
-};
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const dbName = 'E-commerce-app';
 
+let db = null;
+let client = null;
 
-const authDB = mysql.createPool({ ...dbConfig, database: "project" });
-const productDB = mysql.createPool({ ...dbConfig, database: "project" });
+// Connect to MongoDB
+async function connectDB() {
+  try {
+    client = new MongoClient(uri);
+    await client.connect();
+    console.log('✅ Connected to MongoDB');
+    
+    db = client.db(dbName);
+    
+    // Initialize collections
+    const collections = {
+      users: db.collection('users'),
+      products: db.collection('products'),
+      ratings: db.collection('ratings'),
+      wishlist: db.collection('wishlist')
+    };
+    
+    return collections;
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err);
+    throw err;
+  }
+}
 
+// Create a singleton to avoid multiple connections
+let collections = null;
 
-const connectDB = (db, name) => {
-    db.getConnection((err, connection) => {
-        if (err) {
-            console.error(`❌ ${name} connection failed:`, err);
-        } else {
-            console.log(`✅ Connected to ${name}`);
-            connection.release(); 
-        }
-    });
-};
+export async function getCollections() {
+  if (!collections) {
+    collections = await connectDB();
+  }
+  return collections;
+}
 
-connectDB(authDB, "AuthDB (Login)");
-connectDB(productDB, "ProductDB (Products)");
-
-
-export { authDB, productDB };
+// Close MongoDB connection when Node.js process ends
+process.on('SIGINT', async () => {
+  if (client) {
+    await client.close();
+    console.log('MongoDB connection closed');
+    process.exit(0);
+  }
+});

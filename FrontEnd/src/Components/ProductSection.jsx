@@ -28,7 +28,7 @@ const ProductSection = () => {
         const localProducts = localProductsResponse.data.products || [];
         console.log("Local products:", localProducts);
   
-        const fakeStoreProducts = await fetch("https://api.escuelajs.co/api/v1/products")
+        const fakeStoreProducts = await fetch("https://api.escuelajs.co/api/v1/oducts")
           .then((res) => res.json())
           .then((data) => data.map((item) => ({
             id: `fake-${item.id}`,
