@@ -1,4 +1,3 @@
-Here’s your README content converted into Markdown (markup language) format for your E-Commerce App:
 
 ```markdown
 # E-Commerce App: Second-Hand Store with Bidding
