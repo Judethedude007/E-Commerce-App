@@ -1,4 +1,4 @@
-import React, { useState }  from "react";
+import React, { useState } from "react";
 import googleLogo from "../assets/google-logo.png";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -39,14 +39,15 @@ const Signup = () => {
       });
 
       const data = await response.json();
-      console.log("Signup Response:", data); // Debugging
+      console.log("Signup Response:", data);
 
       if (data.error) {
         setError(data.error);
       } else {
         setSuccess("Signup successful! Redirecting...");
-        localStorage.setItem("username", formData.name); 
-        navigate("/"); 
+        localStorage.setItem("username", formData.name);
+        localStorage.setItem("email", formData.email); // ✅ ensure email also stored
+        navigate("/");
       }
     } catch (err) {
       console.error("Signup Error:", err);
@@ -123,12 +124,13 @@ const Signup = () => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <button  className="w-full flex items-center justify-center py-2.5 rounded-lg bg-white border-2 border-green-600 text-black box-border hover:bg-green-100 duration-100 ease-in-out">
+        <button className="w-full flex items-center justify-center py-2.5 rounded-lg bg-white border-2 border-green-600 text-black box-border hover:bg-green-100 duration-100 ease-in-out">
           <img src={googleLogo} alt="Google" className="w-5 mr-2" /> Sign in with Google
         </button>
 
         <p className="text-sm text-center text-gray-500 mt-4">
-          Already have an account? <Link to="/login" className="text-green-800 underline">Log in</Link>
+          Already have an account?{" "}
+          <Link to="/login" className="text-green-800 underline">Log in</Link>
         </p>
       </div>
     </div>

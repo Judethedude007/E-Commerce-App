@@ -18,6 +18,9 @@ app.use("/products", productRouter);
 import addproductRouter from "./models/addproduct.js";
 app.use("/add-product", addproductRouter);
 
+import walletRouter from "./models/wallet.js";
+app.use("/wallet", walletRouter);
+
 import productDetailsRouter from "./models/productDetails.js";  
 app.use("/product", productDetailsRouter);  
 
