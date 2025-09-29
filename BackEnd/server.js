@@ -53,6 +53,23 @@ app.use("/rate-seller", rsellerRouter);
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
 
+import sendMessageRouter from "./models/message.js"; 
+import chatHistoryRouter from "./models/history.js";
+import markReadRouter from "./models/markmsg.js";
+
+
+app.use("/send-message", sendMessageRouter); // Maps to POST /send-message
+app.use("/chat", chatHistoryRouter);           // Maps to GET /chat/history/...
+app.use("/mark-read", markReadRouter);  
+
+import productBuyersRouter from "./models/productBuyers.js";
+app.use("/product-buyers", productBuyersRouter);
+
+import unseenMsgCountRouter from "./models/unseenMsgCount.js";
+app.use("/unseen-msg-count", unseenMsgCountRouter);
+import getUserIdRouter from "./models/getUserId.js";
+app.use("/get-userid", getUserIdRouter);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

@@ -1,40 +1,61 @@
-import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Bell, Edit, Trash2, MessageSquare, Plus } from "lucide-react";
 import axios from "axios";
 
 const Sellitems = () => {
   const navigate = useNavigate();
   const [userProducts, setUserProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
   const [error, setError] = useState(null);
+  const [unseenCounts, setUnseenCounts] = useState({});
+  const [sellerId, setSellerId] = useState(null);
+  const username = localStorage.getItem("username") || "";
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    if (storedUsername) {
-      setUsername(storedUsername);
-    } else {
-      setLoading(false);
-      setError("User not logged in. Please log in to view your listings.");
-    }
-  }, []);
-
+  // Fetch user ID (sellerId) from username
   useEffect(() => {
     if (!username) return;
-    const fetchUserProducts = async () => {
+    const fetchUserId = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8081/get-userid/${username}`);
+        setSellerId(res.data.userId);
+      } catch {
+        setError("Failed to fetch user ID.");
+      }
+    };
+    fetchUserId();
+  }, [username]);
+
+  // Fetch user's products
+  useEffect(() => {
+    if (!sellerId) return;
+    const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8081/user-products/${username}`);
-        setUserProducts(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user products:", error);
+        const res = await axios.get(`http://localhost:8081/user-products/${username}`);
+        setUserProducts(res.data);
+      } catch (err) {
+        setError("Failed to fetch your products.");
+      } finally {
         setLoading(false);
       }
     };
-    fetchUserProducts();
-  }, [username]);
+    fetchProducts();
+  }, [username, sellerId]);
+
+  // Fetch unseen message counts using sellerId
+  useEffect(() => {
+    if (!sellerId) return;
+    const fetchUnseen = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8081/unseen-msg-count/${sellerId}`);
+        setUnseenCounts(res.data);
+      } catch (err) {
+        setUnseenCounts({});
+      }
+    };
+    fetchUnseen();
+  }, [sellerId]);
 
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -76,6 +97,8 @@ const Sellitems = () => {
 
         {loading ? (
           <p className="text-center py-8">Loading your listings...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
         ) : userProducts.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-lg shadow">
             <p className="text-xl font-semibold">No items listed</p>
@@ -118,6 +141,24 @@ const Sellitems = () => {
                     className="p-2 bg-red-50 text-red-700 rounded hover:bg-red-100"
                   >
                     <Trash2 size={18} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if ((unseenCounts[product.id] || 0) > 0) {
+                        navigate(`/productmsg/${product.id}`);
+                      } else {
+                        alert("No messages for this product.");
+                      }
+                    }}
+                    className="relative p-2 bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100"
+                    title="View Messages"
+                  >
+                    <Bell size={18} />
+                    {unseenCounts[product.id] > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+                        {unseenCounts[product.id]}
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>
