@@ -1,13 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
-import { FaHeart } from "react-icons/fa"; // Importing Wishlist icon
-import SearchBar from "./SearchBar"; // Ensure you have imported SearchBar
+import { FaHeart, FaWallet } from "react-icons/fa"; // ✅ Added Wallet icon
+import SearchBar from "./SearchBar"; 
 
 const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // ✅ Fix: Declare searchTerm state
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     setUser(localStorage.getItem("username") || null);
@@ -15,7 +15,7 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("username");
-    setUser(null); // ✅ Fix: Use setUser instead of setUsername
+    setUser(null);
     setIsOpen(false);
     navigate("/login");
   };
@@ -46,10 +46,14 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
         </ul>
       </div>
 
-      {/* Wishlist Icon */}
+      {/* Wishlist + Wallet Icons */}
       <div className="flex items-center space-x-4">
         <NavLink to="/wishlist" className="text-gray-700 hover:text-green-600 text-2xl">
           <FaHeart />
+        </NavLink>
+
+        <NavLink to="/wallet" className="text-gray-700 hover:text-green-600 text-2xl">
+          <FaWallet />
         </NavLink>
 
         {user ? ( 
@@ -63,7 +67,6 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
 
             {isOpen && (
               <div className="absolute right-0 mr-3 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-lg">
-                
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-100"

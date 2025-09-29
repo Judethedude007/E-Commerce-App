@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "./Components/Navbar";
 import Home from "./pages/Homepage";
 import Sellitems from "./pages/Sellitems";
+import Wallet from "./pages/wallet"; // Fixed: Capital W
 import Signin from "./pages/Signin";
 import Signup from "./Components/Signup";
 import Login from "./Components/Login";
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/" element={<Home setSelectedCategory={setSelectedCategory} />} />
         <Route path="/Sellitems" element={<Sellitems />} />
         <Route path="/Signin" element={<Signin setUser={setUser} />} />
+        <Route path="/wallet" element={<Wallet />} /> {/* Fixed */}
         <Route path="/Signup" element={<Signup setUser={setUser} />} />
         <Route path="/create-listing" element={<ProductListing />} />
         <Route path="/Login" element={<Login setUser={setUser} />} />

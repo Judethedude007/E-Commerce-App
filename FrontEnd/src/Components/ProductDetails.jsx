@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star, MessageCircle } from "lucide-react";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -337,7 +337,7 @@ const ProductDetails = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="grid grid-cols-3 gap-4 mb-6">
                                     <button
                                         onClick={handleEmailSeller}
                                         className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
@@ -352,7 +352,15 @@ const ProductDetails = () => {
                                         <Phone className="w-5 h-5 text-gray-400 group-hover:text-green-500 mr-2" />
                                         <span className="font-medium">Contact via WhatsApp</span>
                                     </button>
+                                    <button
+                                        onClick={() => alert("Message feature coming soon!")}
+                                        className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition group"
+                                    >
+                                        <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-purple-500 mr-2" />
+                                        <span className="font-medium">Message Seller</span>
+                                    </button>
                                 </div>
+
 
                                 {/* Rating Section */}
                                 {showRating && (
