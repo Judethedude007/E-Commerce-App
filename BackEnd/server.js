@@ -68,3 +68,5 @@ app.use((err, req, res, next) => {
 app.listen(8081, () => {
     console.log("Server running on http://localhost:8081");
 });
+import walletRouter from "./models/wallet.js";
+app.use("/wallet", walletRouter);
