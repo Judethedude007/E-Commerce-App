@@ -21,6 +21,7 @@ const EditProduct = () => {
     contact_number: "",
     sale_status: 0, // Default to Unsold
     image: null,
+  listing_type: 0, // 0=factual, 1=bidding
   });
 
   useEffect(() => {
@@ -43,8 +44,9 @@ const EditProduct = () => {
           used_time: product.used_time || "",
           used_years: product.used_years || "",
           contact_number: product.contact_number || "",
-          sale_status: product.sale_status || 0, // Ensure it’s a number (0 = Unsold, 1 = Sold)
+          sale_status: product.sale_status || 0,
           image: null,
+          listing_type: typeof product.listing_type === "number" ? product.listing_type : (product.listing_type === "bidding" ? 1 : 0),
         });
         if (product.image_url) setImagePreview(product.image_url);
         setLoading(false);
@@ -59,7 +61,11 @@ const EditProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "listing_type") {
+      setFormData((prev) => ({ ...prev, listing_type: value === "bidding" ? 1 : 0 }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -118,7 +124,21 @@ const EditProduct = () => {
         <input type="text" name="description" placeholder="Description" className="border p-2 rounded-lg" onChange={handleChange} value={formData.description} />
         <input type="text" name="condition" placeholder="Condition" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
         <input type="text" name="location" placeholder="Location" className="border p-2 rounded-lg" onChange={handleChange} value={formData.location} />
-        <input type="number" name="price" placeholder="Enter Price" className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
+  <input type="number" name="price" placeholder={formData.listing_type === "bidding" ? "Starting Price" : "Enter Price"} className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
+        {/* Listing Type Selection */}
+        <div className="mb-2">
+          <label htmlFor="listing_type" className="block mb-1 font-medium">Listing Type</label>
+          <select
+            name="listing_type"
+            id="listing_type"
+            className="border p-2 rounded-lg w-full"
+            value={formData.listing_type === 1 ? "bidding" : "factual"}
+            onChange={handleChange}
+          >
+            <option value="factual">Factual</option>
+            <option value="bidding">Bidding</option>
+          </select>
+        </div>
         <select name="category" className="border p-2 rounded-lg" onChange={handleChange} value={formData.category}>
           <option value="">Select Category</option>
           <option value="Electronics">Electronics</option>

@@ -1,14 +1,12 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star } from "lucide-react";
 
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
-    const [sellerName, setSellerName] = useState(""); // Seller's name
-    const [sellerEmail, setSellerEmail] = useState(""); // Seller's email
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -18,7 +16,86 @@ const ProductDetails = () => {
     const [communicationType, setCommunicationType] = useState(null); // Track which is clicked
     const [existingRating, setExistingRating] = useState(0); // track rating
 
+    // Bidding state
+    const [bidAmount, setBidAmount] = useState("");
+    const [bidLoading, setBidLoading] = useState(false);
+    const [bidError, setBidError] = useState("");
+    const [bidSuccess, setBidSuccess] = useState("");
+    const [bids, setBids] = useState([]);
+    const [bidsLoading, setBidsLoading] = useState(false);
+    const [bidsError, setBidsError] = useState("");
+
     const username = localStorage.getItem("username");
+
+    const isBiddingValue = (v) => (Number(v) === 1 || String(v).toLowerCase() === 'bidding' || String(v) === '1');
+
+    // Live countdown timer state (used for bidding end time UI)
+    const [nowTs, setNowTs] = useState(Date.now());
+    const [timeDrift, setTimeDrift] = useState(0); // server-now minus client-now
+    const DISPLAY_TZ = 'Asia/Kolkata';
+
+    // Fetch server time once on mount to establish drift
+    useEffect(() => {
+        const loadServerTime = async () => {
+            try {
+                const res = await fetch('http://localhost:8081/time');
+                const data = await res.json();
+                const serverMs = Number(data?.db_utc_ms || data?.server_ms);
+                if (Number.isFinite(serverMs)) {
+                    setTimeDrift(serverMs - Date.now());
+                }
+            } catch {
+                // ignore – fall back to client clock
+            }
+        };
+        loadServerTime();
+    }, []);
+
+    // Tick every second to update countdowns using drift-corrected now
+    useEffect(() => {
+        const t = setInterval(() => setNowTs(Date.now() + timeDrift), 1000);
+        return () => clearInterval(t);
+    }, [timeDrift]);
+
+    // Robust UTC parser for MySQL-like 'YYYY-MM-DD HH:mm:ss' or 'YYYY-MM-DDTHH:mm:ss'
+    // Treats the timestamp as UTC when no timezone is present, then converts to local for display
+    const parseUTCDateTime = (val) => {
+        if (!val) return NaN;
+        const s = String(val).trim();
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?$/);
+        if (m) {
+            const [, y, mo, d, h, mi, se] = m;
+            return Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(se));
+        }
+        const ms = Date.parse(s);
+        return Number.isFinite(ms) ? ms : NaN;
+    };
+
+    const formatTimeLeft = (ms) => {
+        if (!Number.isFinite(ms)) return null;
+        if (ms <= 0) return 'Ended';
+        const totalSec = Math.floor(ms / 1000);
+        const days = Math.floor(totalSec / 86400);
+        const hours = Math.floor((totalSec % 86400) / 3600);
+        const minutes = Math.floor((totalSec % 3600) / 60);
+        const seconds = totalSec % 60;
+        if (days > 0) return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+        if (minutes > 0) return `${minutes}m ${seconds}s`;
+        return `${seconds}s`;
+    };
+
+    const formatInTZ = (msOrIso, tz = DISPLAY_TZ) => {
+        const ms = typeof msOrIso === 'number' ? msOrIso : Date.parse(String(msOrIso));
+        if (!Number.isFinite(ms)) return '—';
+        const fmt = new Intl.DateTimeFormat(undefined, {
+            timeZone: tz,
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: '2-digit', second: '2-digit',
+            hour12: true,
+        });
+        return fmt.format(new Date(ms));
+    };
 
     useEffect(() => {
         const fetchProductDetails = async () => {
@@ -29,11 +106,12 @@ const ProductDetails = () => {
                 const res = await axios.get(`http://localhost:8081/product/${id}`);
                 setProduct(res.data);
                 fetchUserRating(res.data.user_id) // new function
-                if (res.data.user_id) {
-                    // fetchSellerDetails(res.data.user_id); // Fetch seller details using user_id
-                }
+                // Seller details already included in this endpoint
                 checkIfWishlisted(res.data.id);
-            } catch (err) {
+                if (isBiddingValue(res.data.listing_type) && username && username === res.data.seller_name) {
+                    fetchBids(res.data.id);
+                }
+            } catch {
                 setError("Failed to load product details.");
             } finally {
                 setLoading(false);
@@ -41,6 +119,8 @@ const ProductDetails = () => {
         };
 
         fetchProductDetails();
+        // Intentionally not adding fetchUserRating/checkIfWishlisted to deps to avoid refetch loops
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchUserRating = async (sellerId) => {
@@ -49,23 +129,84 @@ const ProductDetails = () => {
             const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${username}`);
             //This should be some int from the data being returned as well.
             setExistingRating(res?.data.rating || 0);
-        } catch (error) {
-            console.error("Error fetching rating", error);
+        } catch (e) {
+            console.error("Error fetching rating", e);
             setExistingRating(0);
         }
     }
 
-    // Fetch seller's name and email from backend
-    const fetchSellerDetails = async (userId) => {
-        if (!userId) return;
+    const fetchBids = async (productId) => {
         try {
-            const res = await axios.get(`http://localhost:8081/seller/${userId}`);
-            setSellerName(res.data.seller_name || "Unknown Seller");
-            setSellerEmail(res.data.seller_email || "Not Available");
-        } catch (error) {
-            console.error("Error fetching seller details:", error);
-            setSellerName("Unknown Seller");
-            setSellerEmail("Not Available");
+            setBidsLoading(true);
+            setBidsError("");
+            const res = await axios.get(`http://localhost:8081/bid/${productId}/list`);
+            if (res.data?.success) setBids(res.data.bids || []);
+            else setBidsError(res.data?.message || "Failed to fetch bids");
+        } catch (e) {
+            setBidsError(e?.response?.data?.message || "Failed to fetch bids");
+        } finally {
+            setBidsLoading(false);
+        }
+    };
+
+    // Refresh product details (to update highest_bid and bid_count from backend)
+    const refreshProduct = async () => {
+        try {
+            const res = await axios.get(`http://localhost:8081/product/${id}`);
+            setProduct(res.data);
+        } catch (e) {
+            console.error("Failed to refresh product:", e);
+        }
+    };
+
+    // Bidding: place a bid
+    const handlePlaceBid = async () => {
+        if (!product) return;
+        setBidError("");
+        setBidSuccess("");
+
+        const amount = Number(bidAmount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+            setBidError("Please enter a valid amount.");
+            return;
+        }
+        if (amount <= Math.max(Number(product.price) || 0, Number(product.highest_bid) || 0)) {
+            setBidError(`Bid must be greater than ₹${Math.max(Number(product.price) || 0, Number(product.highest_bid) || 0).toFixed(2)}`);
+            return;
+        }
+        if (!username) {
+            setBidError("Please log in to place a bid.");
+            return;
+        }
+
+        try {
+            setBidLoading(true);
+            const res = await axios.post(`http://localhost:8081/bid/${product.id}`, {
+                username,
+                bid: amount,
+            });
+            if (res.data?.success) {
+                setBidSuccess("Bid placed successfully!");
+                // Update local highest bid and count to avoid full reload
+                setProduct((prev) => ({
+                    ...prev,
+                    highest_bid: Math.max(Number(prev?.highest_bid) || 0, amount),
+                    bid_count: (Number(prev?.bid_count) || 0) + 1,
+                }));
+                setBidAmount("");
+                // Also pull authoritative values from backend (covers concurrency)
+                await refreshProduct();
+                // If the current user is the seller, refresh recent bids list
+                if (username && product && username === product.seller_name) {
+                    fetchBids(product.id);
+                }
+            } else {
+                setBidError(res.data?.message || "Failed to place bid.");
+            }
+        } catch (e) {
+            setBidError(e?.response?.data?.message || "Failed to place bid.");
+        } finally {
+            setBidLoading(false);
         }
     };
 
@@ -82,8 +223,8 @@ const ProductDetails = () => {
                 ...prev,
                 isSold: wishlistedProducts.some((item) => item.product_id === parseInt(productId) && item.isSold),
             }));
-        } catch (error) {
-            console.error("Error checking wishlist status:", error);
+        } catch (e) {
+            console.error("Error checking wishlist status:", e);
         }
     };
 
@@ -101,7 +242,7 @@ const ProductDetails = () => {
 
             setIsWishlisted(true);
             alert("Item added to wishlist!");
-        } catch (error) {
+        } catch {
             alert("Failed to add item to wishlist.");
         }
     };
@@ -136,7 +277,7 @@ const ProductDetails = () => {
             }
 
             //Call the API here.
-            const res = await axios.post("http://localhost:8081/rate-seller", {
+            await axios.post("http://localhost:8081/rate-seller", {
                 sellerId: product.user_id,
                 rating: parseInt(selectedRating),
                 username: username
@@ -180,6 +321,13 @@ const ProductDetails = () => {
     if (!product) return <p>Product not found</p>;
 
     const images = Array.isArray(product.images) ? product.images : [product.image || product.image_url];
+
+    // Derived bidding timing (mirror Sellitems behavior using Date directly)
+    const endTs = isBiddingValue(product?.listing_type) && product?.bid_end_time
+        ? parseUTCDateTime(product.bid_end_time)
+        : null;
+    const timeLeftMs = Number.isFinite(endTs) ? endTs - nowTs : null;
+    const hasEnded = Number.isFinite(endTs) ? timeLeftMs <= 0 : false;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -273,10 +421,19 @@ const ProductDetails = () => {
                                 
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center space-x-2">
-                                        <span className="text-2xl font-bold text-green-600">₹{product.price?.toFixed(2)}</span>
+                                        <span className="text-2xl font-bold text-green-600">
+                                            {isBiddingValue(product.listing_type) && product.highest_bid
+                                                ? `₹${Number(product.highest_bid).toFixed(2)}`
+                                                : `₹${product.price?.toFixed(2)}`}
+                                        </span>
                                         {product.condition && (
                                             <span className="px-2 py-1 text-sm bg-gray-100 text-gray-600 rounded-full">
                                                 {product.condition}
+                                            </span>
+                                        )}
+                                        {isBiddingValue(product.listing_type) && (
+                                            <span className="px-2 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
+                                                {product.bid_count ? `${product.bid_count} bid${product.bid_count > 1 ? 's' : ''}` : 'No bids yet'}
                                             </span>
                                         )}
                                     </div>
@@ -307,6 +464,78 @@ const ProductDetails = () => {
                                             <p className="font-medium">{product.used_time || ""} {product.used_years || "N/A"}</p>
                                         </div>
                                     </div>
+                                    {/* Show bidding/factual type and starting price */}
+                                    {isBiddingValue(product.listing_type) && (
+                                        <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded space-y-2">
+                                            <p className="text-sm text-yellow-700 font-semibold">Bidding Product</p>
+                                            <p className="text-sm text-yellow-800">Starting Price: ₹{product.price?.toFixed(2)}</p>
+                                            <p className="text-sm text-yellow-800">
+                                                Current highest bid: {product.highest_bid ? `₹${Number(product.highest_bid).toFixed(2)}` : '—'}
+                                            </p>
+                                            {product?.bid_end_time && (
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <span className="text-yellow-800">Ends at: {(() => {
+                                                        const ts = parseUTCDateTime(product.bid_end_time);
+                                                        return Number.isFinite(ts) ? formatInTZ(ts) : '—';
+                                                    })()}</span>
+                                                    <span className={`px-2 py-0.5 rounded ${hasEnded ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                        Time left: {Number.isFinite(endTs) ? formatTimeLeft(timeLeftMs) ?? '—' : '—'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {!id.startsWith("fake-") && (
+                                                <div className="pt-1">
+                                                    <label className="block mb-1 font-medium">Place Your Bid</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="number"
+                                                            min={Math.max(Number(product.price) || 0, Number(product.highest_bid) || 0) + 1}
+                                                            step="1"
+                                                            value={bidAmount}
+                                                            onChange={(e) => setBidAmount(e.target.value)}
+                                                            className="border p-2 rounded-lg flex-grow"
+                                                            placeholder={`Enter amount > ₹${Math.max(Number(product.price) || 0, Number(product.highest_bid) || 0).toFixed(2)}`}
+                                                            disabled={bidLoading || hasEnded}
+                                                        />
+                                                        <button
+                                                            onClick={handlePlaceBid}
+                                                            className="bg-yellow-600 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-700 transition"
+                                                            disabled={bidLoading || hasEnded}
+                                                        >
+                                                            {hasEnded ? "Bidding ended" : (bidLoading ? "Bidding..." : "Bid")}
+                                                        </button>
+                                                    </div>
+                                                    {bidError && <p className="text-red-600 mt-2">{bidError}</p>}
+                                                    {bidSuccess && <p className="text-green-600 mt-2">{bidSuccess}</p>}
+                                                    {hasEnded && !bidError && (
+                                                        <p className="text-red-600 mt-2">Bidding for this item has ended.</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {username && username === product.seller_name && (
+                                                <div className="mt-3 border-t border-yellow-200 pt-3">
+                                                    <p className="text-sm font-semibold text-yellow-900">Recent bids (seller view)</p>
+                                                    {bidsLoading ? (
+                                                        <p className="text-sm text-yellow-800">Loading bids…</p>
+                                                    ) : bidsError ? (
+                                                        <p className="text-sm text-red-600">{bidsError}</p>
+                                                    ) : bids.length === 0 ? (
+                                                        <p className="text-sm text-yellow-800">No bids yet.</p>
+                                                    ) : (
+                                                        <ul className="text-sm text-yellow-900 space-y-1 max-h-40 overflow-auto">
+                                                            {bids.map((b) => (
+                                                                <li key={b.id} className="flex justify-between">
+                                                                    <span>₹{Number(b.amount).toFixed(2)}</span>
+                                                                    <span className="text-yellow-700">{b.bidder || 'Unknown'}</span>
+                                                                    <span className="text-yellow-700">{formatInTZ(b.created_at)}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                     {product.description && (
                                         <div>
                                             <p className="text-sm text-gray-500">Description</p>

@@ -59,6 +59,12 @@ app.use("/stats", statsRouter);
 
 app.use("/auth/google", googleAuth);
 
+import bidRouter from "./models/bid.js";
+app.use("/bid", bidRouter);
+
+import timeRouter from "./models/time.js";
+app.use("/time", timeRouter);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
