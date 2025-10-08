@@ -54,6 +54,7 @@ const ProductSection = () => {
         console.log("All products:", allProducts);
         setProducts(allProducts);
         setFilteredProducts(allProducts);
+        
       } catch (error) {
         console.error("Error in fetchProducts:", error);
         setError("Failed to load products.");
@@ -125,6 +126,7 @@ const ProductSection = () => {
       </div>
       <div className="container mx-auto py-2">
         <h2 className="text-3xl font-bold mb-4 text-center">Available Products</h2>
+        
 
         <div className="flex justify-center mb-6 space-x-4">
           <SearchBar products={products} setFilteredProducts={setFilteredProducts} />

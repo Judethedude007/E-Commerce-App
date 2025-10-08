@@ -15,6 +15,7 @@ const ProductListing = () => {
     contact_number: "",
     image: null,
     description: "",
+  listing_type: 0, // 0=factual, 1=bidding
   });
 
   const navigate = useNavigate();
@@ -27,8 +28,12 @@ const ProductListing = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    if (name === "listing_type") {
+      setFormData((prev) => ({ ...prev, listing_type: value === "bidding" ? 1 : 0 }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleImageChange = (e) => {
@@ -56,7 +61,8 @@ const ProductListing = () => {
     formDataToSend.append("used_time", formData.used_time);
     formDataToSend.append("used_years", formData.used_years);
     formDataToSend.append("contact_number", formData.contact_number);
-    formDataToSend.append("image", formData.image);
+  formDataToSend.append("image", formData.image);
+  formDataToSend.append("listing_type", formData.listing_type);
 
     try {
         const res = await axios.post("http://localhost:8081/add-product", formDataToSend, {
@@ -105,7 +111,21 @@ const ProductListing = () => {
            <input type="text" name="description" placeholder="Description" className="border p-2 rounded-lg" onChange={handleChange} value={formData.description} />
           <input type="text" name="condition" placeholder="Brand" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
           <input type="text" name="location" placeholder="Location" className="border p-2 rounded-lg" onChange={handleChange} value={formData.location} />
-          <input type="number" name="price" placeholder="Enter Price" className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
+          <input type="number" name="price" placeholder={formData.listing_type === "bidding" ? "Starting Price" : "Enter Price"} className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
+          {/* Listing Type Selection */}
+          <div className="mb-2">
+            <label htmlFor="listing_type" className="block mb-1 font-medium">Listing Type</label>
+            <select
+              name="listing_type"
+              id="listing_type"
+              className="border p-2 rounded-lg w-full"
+              value={formData.listing_type === 1 ? "bidding" : "factual"}
+              onChange={handleChange}
+            >
+              <option value="factual">Factual</option>
+              <option value="bidding">Bidding</option>
+            </select>
+          </div>
 
           {/* Category Selection */}
           <select name="category" className="border p-2 rounded-lg" onChange={handleChange} value={formData.category}>

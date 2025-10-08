@@ -25,3 +25,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Authorization-related environment variables
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+DB_PASSWORD

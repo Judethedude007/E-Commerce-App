@@ -1,5 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import googleAuth from "./auth/googleAuth.js"; // Updated path
+import dotenv from "dotenv";
+
+dotenv.config(); // Load .env variables
 
 const app = express();
 
@@ -18,11 +22,12 @@ app.use("/products", productRouter);
 import addproductRouter from "./models/addproduct.js";
 app.use("/add-product", addproductRouter);
 
-import productDetailsRouter from "./models/productDetails.js";  
-app.use("/product", productDetailsRouter);  
+import productDetailsRouter from "./models/productDetails.js";
+app.use("/product", productDetailsRouter);
 
 import userproductRouter from "./models/userproduct.js";
 app.use("/user-products", userproductRouter);
+
 import sellerproductRouter from "./models/sellerproduct.js";
 app.use("/seller-products", sellerproductRouter);
 
@@ -53,29 +58,39 @@ app.use("/rate-seller", rsellerRouter);
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
 
-import sendMessageRouter from "./models/message.js"; 
+// ===== CHAT SYSTEM (from chat branch) =====
+import sendMessageRouter from "./models/message.js";
 import chatHistoryRouter from "./models/history.js";
 import markReadRouter from "./models/markmsg.js";
-
-
-app.use("/send-message", sendMessageRouter); // Maps to POST /send-message
-app.use("/chat", chatHistoryRouter);           // Maps to GET /chat/history/...
-app.use("/mark-read", markReadRouter);  
-
 import productBuyersRouter from "./models/productBuyers.js";
-app.use("/product-buyers", productBuyersRouter);
-
 import unseenMsgCountRouter from "./models/unseenMsgCount.js";
-app.use("/unseen-msg-count", unseenMsgCountRouter);
 import getUserIdRouter from "./models/getUserId.js";
+
+app.use("/send-message", sendMessageRouter);
+app.use("/chat", chatHistoryRouter);
+app.use("/mark-read", markReadRouter);
+app.use("/product-buyers", productBuyersRouter);
+app.use("/unseen-msg-count", unseenMsgCountRouter);
 app.use("/get-userid", getUserIdRouter);
 
-// Error handling middleware
+// ===== WALLET & BIDDING SYSTEM (from wallet branch) =====
+app.use("/auth/google", googleAuth);
+
+import bidRouter from "./models/bid.js";
+app.use("/bid", bidRouter);
+
+import timeRouter from "./models/time.js";
+app.use("/time", timeRouter);
+
+import walletRouter from "./models/wallet.js";
+app.use("/wallet", walletRouter);
+
+// ===== ERROR HANDLER =====
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
 app.listen(8081, () => {
-    console.log("Server running on port 8081");
+    console.log("Server running on http://localhost:8081");
 });
