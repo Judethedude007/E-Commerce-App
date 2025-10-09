@@ -1,0 +1,41 @@
+.animate-gpay-success {
+  animation: gpay-success 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes gpay-success {
+  0% {
+    box-shadow: 0 0 0 0 #38a169;
+    transform: scale(1);
+    opacity: 1;
+  }
+  60% {
+    box-shadow: 0 0 0 16px #38a16944;
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 0 0 #38a169;
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@import "tailwindcss";
+
+.transition-effect {
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.5);
+  opacity: 0;
+}
+
+.swirl-effect {
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.5) rotate(360deg);
+  opacity: 0;
+}
+
+.wallet-hover-ring {
+  box-shadow: none;
+}
+.wallet-hover-ring:hover {
+  box-shadow: 0 0 0 3px #38a169;
+}

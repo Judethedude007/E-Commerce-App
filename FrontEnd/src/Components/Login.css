@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+.green-drop-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.green-drop-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300vw;
+  height: 300vh;
+  background-color: #38a169; /* Tailwind green-600 */
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.5s ease-in-out;
+}
+
+.green-drop-effect.active::after {
+  transform: translate(-50%, -50%) scale(1);
+}
