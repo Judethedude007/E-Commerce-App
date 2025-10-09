@@ -100,4 +100,8 @@ const WishlistItem = ({ item, removeFromWishlist }) => (
   </div>
 );
 
+<<<<<<< HEAD
 export default Wishlist;
+=======
+export default Wishlist;
+>>>>>>> 9c184cf (full complete)

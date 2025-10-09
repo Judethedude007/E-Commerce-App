@@ -18,31 +18,41 @@ router.use(session({
 router.use(passport.initialize());
 router.use(passport.session());
 
-// Configure Passport with Google OAuth
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID, // Ensure this is set in .env
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Ensure this is set in .env
-      callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches Google Cloud Console
-    },
-    (accessToken, refreshToken, profile, done) => {
-      console.log("Google profile:", profile); // Log profile for debugging
-      return done(null, profile);
-    }
-  )
-);
+const oauthEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
+if (oauthEnabled) {
+  // Configure Passport with Google OAuth when env is present
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "http://localhost:8081/auth/google/callback",
+      },
+      (accessToken, refreshToken, profile, done) => {
+        console.log("Google profile:", profile);
+        return done(null, profile);
+      }
+    )
+  );
+}
 
 // Serialize and deserialize user
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
 // Routes
-router.get("/", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/", (req, res, next) => {
+  if (!oauthEnabled) return res.status(503).json({ message: "Google OAuth disabled (missing env)" });
+  return passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+});
 
 router.get(
   "/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res, next) => {
+    if (!oauthEnabled) return res.status(503).json({ message: "Google OAuth disabled (missing env)" });
+    return passport.authenticate("google", { failureRedirect: "/" })(req, res, next);
+  },
   async (req, res) => {
     try {
       const username = req.user.displayName;
