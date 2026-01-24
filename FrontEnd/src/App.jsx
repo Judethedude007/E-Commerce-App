@@ -13,6 +13,7 @@ import ProductSection from "./Components/ProductSection";
 import Wishlist from "./Components/wishlist"; 
 import UserProfile from "./Components/seller";
 import AboutUs from "./Components/AboutUs";
+import ProductMsg from "./pages/ProductMsg";
 
 const App = () => {
   const location = useLocation();
@@ -62,6 +63,7 @@ const App = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/user-profile/:userId" element={<UserProfile />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/productmsg/:id" element={<ProductMsg />} />
       </Routes>
     </>
   );

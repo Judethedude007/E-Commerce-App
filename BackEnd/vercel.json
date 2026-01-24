@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "BackEnd/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "BackEnd/dist/**",
+          "BackEnd/package.json",
+          "BackEnd/package-lock.json"
+        ]
+      }
+    },
+    {
+      "src": "FrontEnd/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "FrontEnd/build"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "BackEnd/server.js" },
+    { "src": "/(.*)", "dest": "FrontEnd/build/$1" }
+  ]
+}

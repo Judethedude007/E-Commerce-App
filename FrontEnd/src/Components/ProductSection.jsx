@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import SearchBar from "./SearchBar";
 import CategorySection from "./CategorySection";
+import API_BASE_URL from "../config/apiBase";
 
 const ProductSection = () => {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ const ProductSection = () => {
         setLoading(true);
         setError(null);
   
-        const localProductsResponse = await axios.get("http://localhost:8081/products");
+        const localProductsResponse = await axios.get(`${API_BASE_URL}/products`);
         console.log("Local products response:", localProductsResponse.data);
         
         const localProducts = localProductsResponse.data.products || [];

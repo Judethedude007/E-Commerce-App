@@ -22,11 +22,12 @@ app.use("/products", productRouter);
 import addproductRouter from "./models/addproduct.js";
 app.use("/add-product", addproductRouter);
 
-import productDetailsRouter from "./models/productDetails.js";  
-app.use("/product", productDetailsRouter);  
+import productDetailsRouter from "./models/productDetails.js";
+app.use("/product", productDetailsRouter);
 
 import userproductRouter from "./models/userproduct.js";
 app.use("/user-products", userproductRouter);
+
 import sellerproductRouter from "./models/sellerproduct.js";
 app.use("/seller-products", sellerproductRouter);
 
@@ -35,6 +36,9 @@ app.use("/delete-item", dproductRouter);
 
 import eproductRouter from "./models/edit.js";
 app.use("/update-item", eproductRouter);
+
+import bidBalanceRouter from "./models/bidbalance.js";
+app.use("/place-bid", bidBalanceRouter);
 
 import wproductRouter from "./models/wishlist.js";
 app.use("/wishlist", wproductRouter);
@@ -57,9 +61,37 @@ app.use("/rate-seller", rsellerRouter);
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
 
+import userRatingRouter from "./models/userRating.js";
+app.use("/user-rating", userRatingRouter);
+
+// ===== CHAT SYSTEM (from chat branch) =====
+import sendMessageRouter from "./models/message.js";
+import chatHistoryRouter from "./models/history.js";
+import markReadRouter from "./models/markmsg.js";
+import productBuyersRouter from "./models/productBuyers.js";
+import unseenMsgCountRouter from "./models/unseenMsgCount.js";
+import getUserIdRouter from "./models/getUserId.js";
+
+app.use("/send-message", sendMessageRouter);
+app.use("/chat", chatHistoryRouter);
+app.use("/mark-read", markReadRouter);
+app.use("/product-buyers", productBuyersRouter);
+app.use("/unseen-msg-count", unseenMsgCountRouter);
+app.use("/get-userid", getUserIdRouter);
+
+// ===== WALLET & BIDDING SYSTEM (from wallet branch) =====
 app.use("/auth/google", googleAuth);
 
-// Error handling middleware
+import bidRouter from "./models/bid.js";
+app.use("/bid", bidRouter);
+
+import timeRouter from "./models/time.js";
+app.use("/time", timeRouter);
+
+import walletRouter from "./models/wallet.js";
+app.use("/wallet", walletRouter);
+
+// ===== ERROR HANDLER =====
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });

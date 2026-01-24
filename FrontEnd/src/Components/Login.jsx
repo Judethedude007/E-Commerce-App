@@ -3,6 +3,7 @@ import googleLogo from "../assets/google-logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
+import API_BASE_URL from "../config/apiBase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const Login = () => {
     event.preventDefault();
 
     axios
-      .post("http://localhost:8081/login", { email, password })
+      .post(`${API_BASE_URL}/login`, { email, password })
       .then((response) => {
         console.log(response.data);
         if (response.data.message) {
@@ -54,7 +55,7 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:8081/auth/google"; // Redirect to backend Google OAuth endpoint
+    window.location.href = `${API_BASE_URL}/auth/google`; // Redirect to backend Google OAuth endpoint
   };
 
   return (

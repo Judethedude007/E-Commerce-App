@@ -5,6 +5,20 @@ import {productDB} from "./database.js";
 
 const router = express.Router();
 
+// Convert MySQL DATETIME to ISO UTC string
+const mysqlToIsoUtc = (val) => {
+    if (!val) return null;
+    const s = String(val).trim();
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?$/);
+    if (m) {
+        const [, y, mo, d, h, mi, se] = m;
+        const ms = Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(se));
+        return new Date(ms).toISOString();
+    }
+    const ms = Date.parse(s);
+    return Number.isFinite(ms) ? new Date(ms).toISOString() : null;
+};
+
 
 
 
@@ -29,8 +43,18 @@ router.get('/:username', (req, res) => {
             const userId = result[0].id;
             console.log("User ID found:", userId);
 
+            const query = `
+                SELECT p.*, agg.highest_bid, agg.bid_count
+                FROM products p
+                LEFT JOIN (
+                    SELECT product_id, MAX(amount) AS highest_bid, COUNT(*) AS bid_count
+                    FROM bids
+                    GROUP BY product_id
+                ) agg ON agg.product_id = p.id
+                WHERE p.user_id = ?
+            `;
             productDB.query(
-                "SELECT * FROM products WHERE user_id = ?",
+                query,
                 [userId],
                 (err, data) => {
                     if (err) {
@@ -38,8 +62,14 @@ router.get('/:username', (req, res) => {
                         return res.status(500).json({ error: 'Failed to fetch user items', details: err });
                     }
 
-                    console.log("Query Result:", data);
-                    return res.json(data);
+                    // Normalize bid_end_time to ISO string when present for consistency
+                    const normalized = (data || []).map((p) => ({
+                        ...p,
+                        bid_end_time: mysqlToIsoUtc(p.bid_end_time),
+                    }));
+
+                    console.log("Query Result:", normalized);
+                    return res.json(normalized);
                 }
             );
         }

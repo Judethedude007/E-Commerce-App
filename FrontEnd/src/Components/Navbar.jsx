@@ -3,11 +3,14 @@ import { useEffect, useState } from "react";
 import "./Navbar.css";
 import { FaHeart } from "react-icons/fa"; // Importing Wishlist icon
 import SearchBar from "./SearchBar"; // Ensure you have imported SearchBar
+import WalletIcon from "./WalletIcon";
+import WalletDropdown from "./WalletDropdown";
 
 const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // ✅ Fix: Declare searchTerm state
+  const [showWalletDropdown, setShowWalletDropdown] = useState(false);
 
   useEffect(() => {
     setUser(localStorage.getItem("username") || null);
@@ -51,6 +54,16 @@ const Navbar = ({ user, setUser, products, setFilteredProducts }) => {
         <NavLink to="/wishlist" className="text-gray-700 hover:text-green-600 text-2xl">
           <FaHeart />
         </NavLink>
+
+        {/* Wallet Icon: Only show when user is logged in */}
+        {user && (
+          <div className="relative">
+            <WalletIcon onClick={() => setShowWalletDropdown(true)} />
+            {showWalletDropdown && (
+              <WalletDropdown username={user} onClose={() => setShowWalletDropdown(false)} />
+            )}
+          </div>
+        )}
 
         {user ? ( 
           <div className="relative">

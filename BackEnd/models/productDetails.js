@@ -3,6 +3,37 @@ import { productDB } from "./database.js";
 
 const router = express.Router();
 
+// Convert MySQL DATETIME to ISO UTC string
+const mysqlToIsoUtc = (val) => {
+    if (!val) return null;
+    const s = String(val).trim();
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?$/);
+    if (m) {
+        const [, y, mo, d, h, mi, se] = m;
+        const ms = Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(se));
+        return new Date(ms).toISOString();
+    }
+    const ms = Date.parse(s);
+    return Number.isFinite(ms) ? new Date(ms).toISOString() : null;
+};
+
+// Produce human-friendly IST string from ISO UTC
+const toIstStringFromIso = (iso) => {
+    if (!iso) return null;
+    const ms = Date.parse(String(iso));
+    if (!Number.isFinite(ms)) return null;
+    const istMs = ms + 330 * 60 * 1000; // +05:30
+    const d = new Date(istMs);
+    const pad = (n) => String(n).padStart(2, '0');
+    const yyyy = d.getUTCFullYear();
+    const mm = pad(d.getUTCMonth() + 1);
+    const dd = pad(d.getUTCDate());
+    const HH = pad(d.getUTCHours());
+    const MM = pad(d.getUTCMinutes());
+    const SS = pad(d.getUTCSeconds());
+    return `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
+};
+
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
     console.log("Fetching product details for ID:", id);
@@ -88,17 +119,38 @@ router.get("/:id", async (req, res) => {
                     return res.json(response);
                 }
 
-                // Combine the results
-                const response = {
-                    ...product,
-                    seller_rating: ratingResults ? Number(ratingResults[0]?.avg_rating || 0).toFixed(1) : "0.0",
-                    total_ratings: ratingResults ? Number(ratingResults[0]?.total_ratings || 0) : 0,
-                    seller_name: product.seller_name || "Unknown Seller",
-                    seller_email: product.seller_email || "Not Available"
+                // If product is bidding, also include highest bid and bid count
+                const finalizeAndSend = (extra = {}) => {
+                    const response = {
+                        ...product,
+                        seller_rating: ratingResults ? Number(ratingResults[0]?.avg_rating || 0).toFixed(1) : "0.0",
+                        total_ratings: ratingResults ? Number(ratingResults[0]?.total_ratings || 0) : 0,
+                        seller_name: product.seller_name || "Unknown Seller",
+                        seller_email: product.seller_email || "Not Available",
+                        ...extra
+                    };
+                    console.log("Sending response:", response);
+                    res.json(response);
                 };
 
-                console.log("Sending response:", response);
-                res.json(response);
+                const lt = product.listing_type;
+                const isBidding = Number(lt) === 1 || String(lt).toLowerCase() === 'bidding' || String(lt) === '1';
+                if (isBidding) {
+                    const bidAgg = `SELECT MAX(amount) as highest_bid, COUNT(*) as bid_count FROM bids WHERE product_id = ?`;
+                    productDB.query(bidAgg, [product.id], (berr, bres) => {
+                        if (berr) {
+                            console.error("Bid aggregation error:", berr);
+                            return finalizeAndSend({ highest_bid: null, bid_count: 0 });
+                        }
+                        const highest_bid = bres?.[0]?.highest_bid ? Number(bres[0].highest_bid) : null;
+                        const bid_count = bres?.[0]?.bid_count ? Number(bres[0].bid_count) : 0;
+                        const bid_end_time = mysqlToIsoUtc(product.bid_end_time);
+                        const bid_end_time_ist = toIstStringFromIso(bid_end_time);
+                        finalizeAndSend({ highest_bid, bid_count, bid_end_time, bid_end_time_ist });
+                    });
+                } else {
+                    finalizeAndSend();
+                }
             });
         });
     } catch (error) {
