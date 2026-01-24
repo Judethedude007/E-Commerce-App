@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
+import API_BASE_URL from "../config/apiBase";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -18,7 +19,7 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/wishlist/${username}`);
+      const response = await axios.get(`${API_BASE_URL}/wishlist/${username}`);
       setWishlist(response.data);
     } catch (error) {
       console.error("Error fetching wishlist", error);
@@ -27,7 +28,7 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      await axios.delete(`http://localhost:8081/dwishlist/${username}/${productId}`);
+      await axios.delete(`${API_BASE_URL}/dwishlist/${username}/${productId}`);
       setWishlist(wishlist.filter((item) => item.product_id !== productId));
     } catch (error) {
       console.error("Error removing item from wishlist", error);

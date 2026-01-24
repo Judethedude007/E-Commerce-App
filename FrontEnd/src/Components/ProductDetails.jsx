@@ -47,6 +47,7 @@ const ProductDetails = () => {
 import { useEffect, useState, useRef } from "react"; 
 import axios from "axios";
 import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star, MessageSquare, Send } from "lucide-react"; 
+import API_BASE_URL from "../config/apiBase";
 
 const ProductDetails = () => {
     // --- STATE MANAGEMENT ---
@@ -140,7 +141,7 @@ const ProductDetails = () => {
         try {
             setBidsLoading(true);
             setBidsError("");
-            const res = await axios.get(`http://localhost:8081/bid/${productId}/list`);
+            const res = await axios.get(`${API_BASE_URL}/bid/${productId}/list`);
             if (res.data?.success) setBids(res.data.bids || []);
             else setBidsError(res.data?.message || "Failed to fetch bids");
         } catch (e) { setBidsError(e?.response?.data?.message || "Failed to fetch bids"); }
@@ -150,7 +151,7 @@ const ProductDetails = () => {
     const fetchChatHistory = async (currentSellerId) => {
         if (!userIdString || !currentSellerId) return;
         try {
-            const res = await axios.get(`http://localhost:8081/chat/history/${id}/${userIdString}/${currentSellerId}`);
+            const res = await axios.get(`${API_BASE_URL}/chat/history/${id}/${userIdString}/${currentSellerId}`);
             setMessages(res.data);
         } catch (err) {
             console.error("Failed to load chat history:", err);
@@ -162,11 +163,15 @@ const ProductDetails = () => {
         if (!sellerId) return;
         try {
 <<<<<<< HEAD
+<<<<<<< HEAD
             const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${username}`);
             //This should be some int from the data being returned as well.
 =======
             const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${userIdString}`);
 >>>>>>> 9c184cf (full complete)
+=======
+            const res = await axios.get(`${API_BASE_URL}/user-rating/${sellerId}/${userIdString}`);
+>>>>>>> 8fb8d9f (refactor: read API base from env)
             setExistingRating(res?.data.rating || 0);
         } catch (error) {
             console.error("Error fetching rating", error);
@@ -207,7 +212,7 @@ const ProductDetails = () => {
     const checkIfWishlisted = async (productId) => {
         if (!userIdString) return;
         try {
-            const res = await axios.get(`http://localhost:8081/wishlist/${userIdString}`);
+            const res = await axios.get(`${API_BASE_URL}/wishlist/${userIdString}`);
             const wishlistedProducts = res.data.map((item) => item.product_id);
             setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
 >>>>>>> 9c184cf (full complete)
@@ -233,7 +238,7 @@ const ProductDetails = () => {
     const fetchWalletBalance = async () => {
         if (!userIdString) return;
         try {
-            const res = await axios.get(`http://localhost:8081/wallet/${userIdString}`);
+            const res = await axios.get(`${API_BASE_URL}/wallet/${userIdString}`);
             setWalletBalance(res.data.wallet_balance);
         } catch (e) {
             setWalletBalance(null);
@@ -262,7 +267,7 @@ const ProductDetails = () => {
         setBidError("");
         setBidSuccess("");
 
-        const res = await axios.post(`http://localhost:8081/place-bid/place/${id}`, {
+        const res = await axios.post(`${API_BASE_URL}/place-bid/place/${id}`, {
             username: userIdString,
             bid: parseFloat(bidAmount)
         });
@@ -309,7 +314,7 @@ const ProductDetails = () => {
         try {
             setMessages(prev => [...prev, tempMessage]); 
             setNewMessage(''); 
-            await axios.post('http://localhost:8081/send-message', messageData); 
+            await axios.post(`${API_BASE_URL}/send-message`, messageData); 
             fetchChatHistory(currentSellerId); // Refresh with server data
         } catch (error) {
             console.error("Failed to send message (Backend Error):", error.response?.status, error.message);
@@ -325,7 +330,7 @@ const ProductDetails = () => {
             return;
         }
         try {
-            await axios.post("http://localhost:8081/iwishlist", {
+            await axios.post(`${API_BASE_URL}/iwishlist`, {
                 username: userIdString, 
                 product_id: id,
             });
@@ -406,7 +411,7 @@ const ProductDetails = () => {
                 alert("Must submit a rating greater than zero.");
                 return;
             }
-            await axios.post("http://localhost:8081/rate-seller", {
+            await axios.post(`${API_BASE_URL}/rate-seller`, {
                 sellerId: product.user_id,
                 rating: parseInt(selectedRating),
                 username: userIdString
@@ -451,7 +456,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const loadServerTime = async () => {
             try {
-                const res = await fetch('http://localhost:8081/time');
+                const res = await fetch(`${API_BASE_URL}/time`);
                 const data = await res.json();
                 const serverMs = Number(data?.db_utc_ms || data?.server_ms);
                 if (Number.isFinite(serverMs)) setTimeDrift(serverMs - Date.now());
@@ -474,7 +479,7 @@ const ProductDetails = () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await axios.get(`http://localhost:8081/product/${id}`);
+                const res = await axios.get(`${API_BASE_URL}/product/${id}`);
                 const productData = res.data;
                 setProduct(productData);
                 const currentSellerId = productData.user_id;

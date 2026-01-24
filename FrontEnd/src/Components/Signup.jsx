@@ -1,6 +1,7 @@
 import React, { useState }  from "react";
 import googleLogo from "../assets/google-logo.png";
 import { Link, useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/apiBase";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8081/signin", {
+      const response = await fetch(`${API_BASE_URL}/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

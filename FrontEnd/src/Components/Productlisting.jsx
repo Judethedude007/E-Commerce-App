@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/apiBase";
 
 const ProductListing = () => {
   const [formData, setFormData] = useState({
@@ -77,7 +78,7 @@ const ProductListing = () => {
 >>>>>>> 9c184cf (full complete)
 
     try {
-        const res = await axios.post("http://localhost:8081/add-product", formDataToSend, {
+        const res = await axios.post(`${API_BASE_URL}/add-product`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 

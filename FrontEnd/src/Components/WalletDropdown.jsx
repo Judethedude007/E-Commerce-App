@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DummyPayment from "./DummyPayment";
+import API_BASE_URL from "../config/apiBase";
 
 const WalletDropdown = ({ username, onClose }) => {
   const [balance, setBalance] = useState(0);
@@ -14,7 +15,7 @@ const WalletDropdown = ({ username, onClose }) => {
   useEffect(() => {
     if (!username) return;
     setLoading(true);
-    axios.get(`http://localhost:8081/wallet/${username}`)
+    axios.get(`${API_BASE_URL}/wallet/${username}`)
       .then(res => {
         setBalance(res.data.wallet_balance || 0);
         setLoading(false);
@@ -38,7 +39,7 @@ const WalletDropdown = ({ username, onClose }) => {
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
   const handlePaymentSuccess = () => {
-    axios.post(`http://localhost:8081/wallet/${username}/add`, { amount: Number(amount) })
+    axios.post(`${API_BASE_URL}/wallet/${username}/add`, { amount: Number(amount) })
       .then(() => {
         setShowSuccessAnim(true);
         setTimeout(() => {

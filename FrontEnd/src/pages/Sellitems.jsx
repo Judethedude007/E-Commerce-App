@@ -136,6 +136,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Edit, Trash2, Plus, Clock, Users, X } from "lucide-react";
 import axios from "axios";
+import API_BASE_URL from "../config/apiBase";
 
 const Sellitems = () => {
     const navigate = useNavigate();
@@ -171,7 +172,7 @@ const Sellitems = () => {
         if (!username) return;
         const fetchUserId = async () => {
             try {
-                const res = await axios.get(`http://localhost:8081/get-userid/${username}`);
+                const res = await axios.get(`${API_BASE_URL}/get-userid/${username}`);
                 setSellerId(res.data.userId);
             } catch {
                 setError("Failed to fetch user ID.");
@@ -186,7 +187,7 @@ const Sellitems = () => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:8081/user-products/${username}`);
+                const res = await axios.get(`${API_BASE_URL}/user-products/${username}`);
                 setUserProducts(res.data);
             } catch (err) {
                 setError("Failed to fetch your products.");
@@ -202,7 +203,7 @@ const Sellitems = () => {
         if (!sellerId) return;
         const fetchUnseen = async () => {
             try {
-                const res = await axios.get(`http://localhost:8081/unseen-msg-count/${sellerId}`);
+                const res = await axios.get(`${API_BASE_URL}/unseen-msg-count/${sellerId}`);
                 setUnseenCounts(res.data);
             } catch {
                 setUnseenCounts({});
@@ -215,7 +216,7 @@ const Sellitems = () => {
     useEffect(() => {
         const loadServerTime = async () => {
             try {
-                const res = await fetch("http://localhost:8081/time");
+                const res = await fetch(`${API_BASE_URL}/time`);
                 const data = await res.json();
                 const serverMs = Number(data?.db_utc_ms || data?.server_ms);
                 if (Number.isFinite(serverMs)) {
@@ -272,7 +273,7 @@ const Sellitems = () => {
     const fetchRecentBids = async (productId) => {
         try {
             setLoadingBidsFor(productId);
-            const res = await axios.get(`http://localhost:8081/bid/${productId}/list`);
+            const res = await axios.get(`${API_BASE_URL}/bid/${productId}/list`);
             if (res.data?.success) {
                 setBidsByProduct((prev) => ({ ...prev, [productId]: res.data.bids || [] }));
             }
@@ -285,7 +286,7 @@ const Sellitems = () => {
 
     const scheduleStopBidIn10 = async (productId) => {
         try {
-            const res = await axios.post(`http://localhost:8081/bid/${productId}/stop-in-10`, { username });
+            const res = await axios.post(`${API_BASE_URL}/bid/${productId}/stop-in-10`, { username });
             if (res.data?.success) {
                 const effectiveIso = res.data.bid_end_time;
                 alert(`Bidding will stop at ${formatInTZ(effectiveIso)}`);
@@ -303,7 +304,7 @@ const Sellitems = () => {
     const handleDelete = async (productId) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
-                await axios.delete(`http://localhost:8081/delete-item/${productId}`);
+                await axios.delete(`${API_BASE_URL}/delete-item/${productId}`);
                 setUserProducts(userProducts.filter((product) => product.id !== productId));
             } catch (e) {
                 alert("Failed to delete product: " + (e?.response?.data?.error || "unknown error"));
@@ -329,7 +330,7 @@ const Sellitems = () => {
             return;
         }
         try {
-            const res = await axios.post(`http://localhost:8081/bid/${productId}/set-expiry`, {
+            const res = await axios.post(`${API_BASE_URL}/bid/${productId}/set-expiry`, {
                 username,
                 expiry,
             });
@@ -350,7 +351,7 @@ const Sellitems = () => {
         if (!window.confirm("Are you sure you want to finalize bidding? This will transfer the winning amount to your wallet and mark the item as sold.")) return;
         setFinalizeLoading(productId);
         try {
-            const res = await axios.post(`http://localhost:8081/bid/${productId}/finalize`, { username });
+            const res = await axios.post(`${API_BASE_URL}/bid/${productId}/finalize`, { username });
             if (res.data?.success) {
                 alert("Bidding finalized! The amount has been transferred to your wallet.");
                 setUserProducts((prev) =>

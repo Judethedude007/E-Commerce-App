@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Save } from "lucide-react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import API_BASE_URL from "../config/apiBase";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/product/${productId}`);
+        const response = await axios.get(`${API_BASE_URL}/product/${productId}`);
         const product = response.data;
         setFormData({
           title: product.title || "",
@@ -96,7 +97,7 @@ const EditProduct = () => {
     });
 
     try {
-      const res = await axios.put(`http://localhost:8081/update-item/${productId}`, formDataToSend, {
+      const res = await axios.put(`${API_BASE_URL}/update-item/${productId}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.message === "Product updated successfully") {
