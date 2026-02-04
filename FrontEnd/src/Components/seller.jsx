@@ -14,11 +14,11 @@ const UserProfile = () => {
       setLoading(true);
       try {
         // Fetch Seller Profile (name, email, rating)
-        const userRes = await axios.get(`http://localhost:8081/seller-profile/${userId}`);
+        const userRes = await axios.get(`http://${import.meta.env.vite_api_url}:8081/seller-profile/${userId}`);
         setUser(userRes.data);
 
         // Fetch Products by Seller
-        const productsRes = await axios.get(`http://localhost:8081/seller-products/${userId}`);
+        const productsRes = await axios.get(`http://${import.meta.env.vite_api_url}:8081/seller-products/${userId}`);
         setProducts(productsRes.data);
       } catch (err) {
         setError("Failed to load user profile.");

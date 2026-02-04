@@ -16,7 +16,7 @@ const AboutUs = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get("http://localhost:8081/stats");
+                const response = await axios.get("http://${import.meta.env.vite_api_url}:8081/stats");
                 setStats(response.data);
             } catch (err) {
                 setError("Failed to load marketplace statistics");

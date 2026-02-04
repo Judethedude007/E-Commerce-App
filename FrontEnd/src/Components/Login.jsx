@@ -28,7 +28,7 @@ const Login = () => {
     event.preventDefault();
 
     axios
-      .post("http://localhost:8081/login", { email, password })
+      .post("http://${import.meta.env.vite_api_url}:8081/login", { email, password })
       .then((response) => {
         console.log(response.data);
         if (response.data.message) {
@@ -54,7 +54,7 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:8081/auth/google"; // Redirect to backend Google OAuth endpoint
+    window.location.href = "http://${import.meta.env.vite_api_url}:8081/auth/google"; // Redirect to backend Google OAuth endpoint
   };
 
   return (

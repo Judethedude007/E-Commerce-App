@@ -45,7 +45,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const loadServerTime = async () => {
             try {
-                const res = await fetch('http://localhost:8081/time');
+                const res = await fetch('http://${import.meta.env.vite_api_url}:8081/time');
                 const data = await res.json();
                 const serverMs = Number(data?.db_utc_ms || data?.server_ms);
                 if (Number.isFinite(serverMs)) setTimeDrift(serverMs - Date.now());
@@ -102,7 +102,7 @@ const ProductDetails = () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await axios.get(`http://localhost:8081/product/${id}`);
+                const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/product/${id}`);
                 setProduct(res.data);
                 fetchUserRating(res.data.user_id);
                 checkIfWishlisted(res.data.id);
@@ -119,7 +119,7 @@ const ProductDetails = () => {
     const fetchUserRating = async (sellerId) => {
         if (!sellerId) return;
         try {
-            const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${userIdString}`);
+            const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/user-rating/${sellerId}/${userIdString}`);
             setExistingRating(res?.data.rating || 0);
         } catch (e) { setExistingRating(0); }
     };
@@ -128,7 +128,7 @@ const ProductDetails = () => {
         try {
             setBidsLoading(true);
             setBidsError("");
-            const res = await axios.get(`http://localhost:8081/bid/${productId}/list`);
+            const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/bid/${productId}/list`);
             if (res.data?.success) setBids(res.data.bids || []);
             else setBidsError(res.data?.message || "Failed to fetch bids");
         } catch (e) { setBidsError(e?.response?.data?.message || "Failed to fetch bids"); }
@@ -138,7 +138,7 @@ const ProductDetails = () => {
     const checkIfWishlisted = async (productId) => {
         if (!userIdString) return;
         try {
-            const res = await axios.get(`http://localhost:8081/wishlist/${userIdString}`);
+            const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/wishlist/${userIdString}`);
             const wishlistedProducts = res.data.map((item) => item.product_id);
             setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
         } catch (e) { console.error(e); }

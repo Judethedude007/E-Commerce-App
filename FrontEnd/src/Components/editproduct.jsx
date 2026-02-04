@@ -32,7 +32,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/product/${productId}`);
+        const response = await axios.get(`http://${import.meta.env.vite_api_url}:8081/product/${productId}`);
         const product = response.data;
         setFormData({
           title: product.title || "",
@@ -84,7 +84,7 @@ const EditProduct = () => {
     });
 
     try {
-      const res = await axios.put(`http://localhost:8081/update-item/${productId}`, formDataToSend, {
+      const res = await axios.put(`http://${import.meta.env.vite_api_url}:8081/update-item/${productId}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.message === "Product updated successfully") {

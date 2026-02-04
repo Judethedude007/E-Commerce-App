@@ -18,7 +18,7 @@ const ProductMsg = () => {
   // Fetch sellerId (userId) from username
   useEffect(() => {
     if (!username) return;
-    axios.get(`http://localhost:8081/get-userid/${username}`)
+    axios.get(`http://${import.meta.env.vite_api_url}:8081/get-userid/${username}`)
       .then(res => setSellerId(res.data.userId))
       .catch(() => {});
   }, [username]);
@@ -27,7 +27,7 @@ const ProductMsg = () => {
   useEffect(() => {
     if (!productId) return;
     setLoading(true);
-    axios.get(`http://localhost:8081/product-buyers/${productId}`)
+    axios.get(`http://${import.meta.env.vite_api_url}:8081/product-buyers/${productId}`)
       .then(res => setBuyers(res.data))
       .finally(() => setLoading(false));
   }, [productId]);
@@ -36,7 +36,7 @@ const ProductMsg = () => {
   useEffect(() => {
     if (!selectedBuyer || !sellerId) return;
     setChatLoading(true);
-    axios.get(`http://localhost:8081/chat/history/${productId}/${sellerId}/${selectedBuyer.user_id}`)
+    axios.get(`http://${import.meta.env.vite_api_url}:8081/chat/history/${productId}/${sellerId}/${selectedBuyer.user_id}`)
       .then(res => setChatMessages(res.data))
       .finally(() => setChatLoading(false));
   }, [selectedBuyer, sellerId, productId]);
@@ -66,7 +66,7 @@ const ProductMsg = () => {
     ]);
     setChatInput("");
     try {
-      await axios.post("http://localhost:8081/send-message", messageData);
+      await axios.post("http://${import.meta.env.vite_api_url}:8081/send-message", messageData);
     } catch {
       alert("Failed to send message");
     }

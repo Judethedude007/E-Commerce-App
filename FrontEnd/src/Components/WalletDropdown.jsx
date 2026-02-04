@@ -14,7 +14,7 @@ const WalletDropdown = ({ username, onClose }) => {
   useEffect(() => {
     if (!username) return;
     setLoading(true);
-    axios.get(`http://localhost:8081/wallet/${username}`)
+    axios.get(`http://${import.meta.env.vite_api_url}:8081/wallet/${username}`)
       .then(res => {
         setBalance(res.data.wallet_balance || 0);
         setLoading(false);
@@ -38,7 +38,7 @@ const WalletDropdown = ({ username, onClose }) => {
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
   const handlePaymentSuccess = () => {
-    axios.post(`http://localhost:8081/wallet/${username}/add`, { amount: Number(amount) })
+    axios.post(`http://${import.meta.env.vite_api_url}:8081/wallet/${username}/add`, { amount: Number(amount) })
       .then(() => {
         setShowSuccessAnim(true);
         setTimeout(() => {

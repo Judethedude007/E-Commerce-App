@@ -31,7 +31,7 @@ const Sellitems = () => {
     if (!username) return;
     const fetchUserId = async () => {
       try {
-        const res = await axios.get(`http://localhost:8081/get-userid/${username}`);
+        const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/get-userid/${username}`);
         setSellerId(res.data.userId);
       } catch {
         setError("Failed to fetch user ID.");
@@ -46,7 +46,7 @@ const Sellitems = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:8081/user-products/${username}`);
+        const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/user-products/${username}`);
         setUserProducts(res.data);
       } catch (err) {
         setError("Failed to fetch your products.");
@@ -62,7 +62,7 @@ const Sellitems = () => {
     if (!sellerId) return;
     const fetchUnseen = async () => {
       try {
-        const res = await axios.get(`http://localhost:8081/unseen-msg-count/${sellerId}`);
+        const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/unseen-msg-count/${sellerId}`);
         setUnseenCounts(res.data);
       } catch {
         setUnseenCounts({});
@@ -75,7 +75,7 @@ const Sellitems = () => {
   useEffect(() => {
     const loadServerTime = async () => {
       try {
-        const res = await fetch("http://localhost:8081/time");
+        const res = await fetch("http://${import.meta.env.vite_api_url}:8081/time");
         const data = await res.json();
         const serverMs = Number(data?.db_utc_ms || data?.server_ms);
         if (Number.isFinite(serverMs)) {
@@ -152,7 +152,7 @@ const Sellitems = () => {
   const fetchRecentBids = async (productId) => {
     try {
       setLoadingBidsFor(productId);
-      const res = await axios.get(`http://localhost:8081/bid/${productId}/list`);
+      const res = await axios.get(`http://${import.meta.env.vite_api_url}:8081/bid/${productId}/list`);
       if (res.data?.success) {
         setBidsByProduct((prev) => ({ ...prev, [productId]: res.data.bids || [] }));
       }
@@ -165,7 +165,7 @@ const Sellitems = () => {
 
   const scheduleStopBidIn10 = async (productId) => {
     try {
-      const res = await axios.post(`http://localhost:8081/bid/${productId}/stop-in-10`, { username });
+      const res = await axios.post(`http://${import.meta.env.vite_api_url}:8081/bid/${productId}/stop-in-10`, { username });
       if (res.data?.success) {
         const serverEndIso = res.data.bid_end_time;
         const serverEndIstStr = res.data.bid_end_time_ist;
@@ -177,7 +177,7 @@ const Sellitems = () => {
           prev.map((p) => (p.id === productId ? { ...p, bid_end_time: effectiveIso } : p))
         );
         try {
-          const response = await axios.get(`http://localhost:8081/user-products/${username}`);
+          const response = await axios.get(`http://${import.meta.env.vite_api_url}:8081/user-products/${username}`);
           setUserProducts(response.data);
         } catch {}
       } else {
@@ -191,7 +191,7 @@ const Sellitems = () => {
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:8081/delete-item/${productId}`);
+        await axios.delete(`http://${import.meta.env.vite_api_url}:8081/delete-item/${productId}`);
         setUserProducts(userProducts.filter((product) => product.id !== productId));
       } catch (e) {
         alert("Failed to delete product: " + (e?.response?.data?.error || e.message || "unknown error"));
