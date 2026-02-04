@@ -18,7 +18,7 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const response = await axios.get(`http://${import.meta.env.vite_api_url}:8081/wishlist/${username}`);
+      const response = await axios.get(`${import.meta.env.vite_api_url}/wishlist/${username}`);
       setWishlist(response.data);
     } catch (error) {
       console.error("Error fetching wishlist", error);
@@ -27,7 +27,7 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      await axios.delete(`http://${import.meta.env.vite_api_url}:8081/dwishlist/${username}/${productId}`);
+      await axios.delete(`${import.meta.env.vite_api_url}/dwishlist/${username}/${productId}`);
       setWishlist(wishlist.filter((item) => item.product_id !== productId));
     } catch (error) {
       console.error("Error removing item from wishlist", error);

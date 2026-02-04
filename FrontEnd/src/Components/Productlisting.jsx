@@ -65,7 +65,7 @@ const ProductListing = () => {
   formDataToSend.append("listing_type", formData.listing_type);
 
     try {
-        const res = await axios.post("http://${import.meta.env.vite_api_url}:8081/add-product", formDataToSend, {
+        const res = await axios.post(`${import.meta.env.vite_api_url}/add-product`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 

@@ -21,8 +21,8 @@ const ProductSection = () => {
       try {
         setLoading(true);
         setError(null);
-  
-        const localProductsResponse = await axios.get("http://${import.meta.env.vite_api_url}:8081/products");
+
+        const localProductsResponse = await axios.get(`${import.meta.env.vite_api_url}/products`);
         console.log("Local products response:", localProductsResponse.data);
         
         const localProducts = localProductsResponse.data.products || [];
