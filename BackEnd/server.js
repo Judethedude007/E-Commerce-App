@@ -45,9 +45,6 @@ app.use("/delete-item", dproductRouter);
 import eproductRouter from "./models/edit.js";
 app.use("/update-item", eproductRouter);
 
-import bidBalanceRouter from "./models/bidbalance.js";
-app.use("/place-bid", bidBalanceRouter);
-
 import wproductRouter from "./models/wishlist.js";
 app.use("/wishlist", wproductRouter);
 
@@ -68,9 +65,6 @@ app.use("/rate-seller", rsellerRouter);
 
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
-
-import userRatingRouter from "./models/userRating.js";
-app.use("/user-rating", userRatingRouter);
 
 // ===== CHAT SYSTEM (from chat branch) =====
 import sendMessageRouter from "./models/message.js";
