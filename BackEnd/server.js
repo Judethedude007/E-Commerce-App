@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8081;
 app.use(cors({
   origin: [
     "http://localhost:5173",          // local frontend (Vite)
-    "https://e-commerce-app-007.vercel.app/" // your Vercel domain (add later)
+    "https://e-commerce-app-007.vercel.app" // your Vercel domain (add later)
   ],
   credentials: true
 }));
