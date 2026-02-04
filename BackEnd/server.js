@@ -6,8 +6,16 @@ import dotenv from "dotenv";
 dotenv.config(); // Load .env variables
 
 const app = express();
+const PORT = process.env.PORT || 8081;
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",          // local frontend (Vite)
+    "https://your-frontend.vercel.app" // your Vercel domain (add later)
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 import signinRouter from "./models/signin.js";
@@ -37,6 +45,9 @@ app.use("/delete-item", dproductRouter);
 import eproductRouter from "./models/edit.js";
 app.use("/update-item", eproductRouter);
 
+import bidBalanceRouter from "./models/bidbalance.js";
+app.use("/place-bid", bidBalanceRouter);
+
 import wproductRouter from "./models/wishlist.js";
 app.use("/wishlist", wproductRouter);
 
@@ -57,6 +68,9 @@ app.use("/rate-seller", rsellerRouter);
 
 import statsRouter from "./models/stats.js";
 app.use("/stats", statsRouter);
+
+import userRatingRouter from "./models/userRating.js";
+app.use("/user-rating", userRatingRouter);
 
 // ===== CHAT SYSTEM (from chat branch) =====
 import sendMessageRouter from "./models/message.js";
@@ -91,6 +105,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(8081, () => {
-    console.log("Server running on http://localhost:8081");
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
