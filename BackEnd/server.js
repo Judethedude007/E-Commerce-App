@@ -43,16 +43,41 @@ dotenv.config();
 
 const app = express();
 
-// ===== CORS — must be before all routes =====
+// ===== ✅ DYNAMIC CORS CONFIG =====
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // your main domain (production)
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://ecommerceapp-seven-ochre.vercel.app',
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman / mobile apps)
+    if (!origin) return callback(null, true);
+
+    // allow Vercel preview deployments
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    // allow your main frontend domain
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // block everything else
+    return callback(new Error("Not allowed by CORS"));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true
 }));
 
-// Handle pre-flight OPTIONS requests for all routes
+// ===== ✅ PREFLIGHT HANDLING =====
 app.options('*', cors({
-  origin: process.env.FRONTEND_URL || 'https://ecommerceapp-seven-ochre.vercel.app',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (origin.endsWith(".vercel.app")) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true
 }));
@@ -95,8 +120,8 @@ app.use("/wallet", walletRouter);
 
 // ===== GLOBAL ERROR HANDLER =====
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  console.error("ERROR:", err.message);
+  res.status(500).json({ error: err.message || 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 8081;
