@@ -1,6 +1,7 @@
 import React, { useState }  from "react";
 import googleLogo from "../assets/google-logo.png";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -28,17 +29,13 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/signin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
+      const response = await api.post('/signin', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
+      const data = response.data;
       console.log("Signup Response:", data); // Debugging
 
       if (data.error) {
