@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import googleLogo from "../assets/google-logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import "./Login.css";
 
 const Login = () => {
@@ -27,8 +27,8 @@ const Login = () => {
   function handleSubmit(event) {
     event.preventDefault();
 
-    axios
-      .post(`${import.meta.env.vite_api_url}/login`, { email, password })
+    api
+      .post('/login', { email, password })
       .then((response) => {
         console.log(response.data);
         if (response.data.message) {
@@ -54,7 +54,7 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${import.meta.env.vite_api_url}/auth/google`; // Redirect to backend Google OAuth endpoint
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`; // Redirect to backend Google OAuth endpoint
   };
 
   return (

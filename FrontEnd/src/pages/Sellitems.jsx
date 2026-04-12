@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Edit, Trash2, MessageSquare, Plus, Clock, Users } from "lucide-react";
-import axios from "axios";
+import api from "../api/axios";
 
 const Sellitems = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const Sellitems = () => {
     if (!username) return;
     const fetchUserId = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.vite_api_url}/get-userid/${username}`);
+        const res = await api.get(`/get-userid/${username}`);
         setSellerId(res.data.userId);
       } catch {
         setError("Failed to fetch user ID.");
@@ -46,7 +46,7 @@ const Sellitems = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${import.meta.env.vite_api_url}/user-products/${username}`);
+        const res = await api.get(`/user-products/${username}`);
         setUserProducts(res.data);
       } catch (err) {
         setError("Failed to fetch your products.");
@@ -62,7 +62,7 @@ const Sellitems = () => {
     if (!sellerId) return;
     const fetchUnseen = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.vite_api_url}/unseen-msg-count/${sellerId}`);
+        const res = await api.get(`/unseen-msg-count/${sellerId}`);
         setUnseenCounts(res.data);
       } catch {
         setUnseenCounts({});
@@ -75,7 +75,7 @@ const Sellitems = () => {
   useEffect(() => {
     const loadServerTime = async () => {
       try {
-        const res = await fetch(`${import.meta.env.vite_api_url}/time`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/time`);
         const data = await res.json();
         const serverMs = Number(data?.db_utc_ms || data?.server_ms);
         if (Number.isFinite(serverMs)) {
@@ -152,7 +152,7 @@ const Sellitems = () => {
   const fetchRecentBids = async (productId) => {
     try {
       setLoadingBidsFor(productId);
-      const res = await axios.get(`${import.meta.env.vite_api_url}/bid/${productId}/list`);
+      const res = await api.get(`/bid/${productId}/list`);
       if (res.data?.success) {
         setBidsByProduct((prev) => ({ ...prev, [productId]: res.data.bids || [] }));
       }
@@ -165,7 +165,7 @@ const Sellitems = () => {
 
   const scheduleStopBidIn10 = async (productId) => {
     try {
-      const res = await axios.post(`${import.meta.env.vite_api_url}/bid/${productId}/stop-in-10`, { username });
+      const res = await api.post(`/bid/${productId}/stop-in-10`, { username });
       if (res.data?.success) {
         const serverEndIso = res.data.bid_end_time;
         const serverEndIstStr = res.data.bid_end_time_ist;
@@ -177,7 +177,7 @@ const Sellitems = () => {
           prev.map((p) => (p.id === productId ? { ...p, bid_end_time: effectiveIso } : p))
         );
         try {
-          const response = await axios.get(`${import.meta.env.vite_api_url}/user-products/${username}`);
+          const response = await api.get(`/user-products/${username}`);
           setUserProducts(response.data);
         } catch {}
       } else {
@@ -191,7 +191,7 @@ const Sellitems = () => {
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`${import.meta.env.vite_api_url}/delete-item/${productId}`);
+        await api.delete(`/delete-item/${productId}`);
         setUserProducts(userProducts.filter((product) => product.id !== productId));
       } catch (e) {
         alert("Failed to delete product: " + (e?.response?.data?.error || e.message || "unknown error"));

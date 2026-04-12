@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import DummyPayment from "./DummyPayment";
 
 const WalletDropdown = ({ username, onClose }) => {
@@ -14,7 +14,7 @@ const WalletDropdown = ({ username, onClose }) => {
   useEffect(() => {
     if (!username) return;
     setLoading(true);
-    axios.get(`${import.meta.env.vite_api_url}/wallet/${username}`)
+    api.get(`/wallet/${username}`)
       .then(res => {
         setBalance(res.data.wallet_balance || 0);
         setLoading(false);
@@ -38,7 +38,7 @@ const WalletDropdown = ({ username, onClose }) => {
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
   const handlePaymentSuccess = () => {
-    axios.post(`${import.meta.env.vite_api_url}/wallet/${username}/add`, { amount: Number(amount) })
+    api.post(`/wallet/${username}/add`, { amount: Number(amount) })
       .then(() => {
         setShowSuccessAnim(true);
         setTimeout(() => {

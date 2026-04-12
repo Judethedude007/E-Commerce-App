@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 const ProductListing = () => {
@@ -65,7 +65,7 @@ const ProductListing = () => {
   formDataToSend.append("listing_type", formData.listing_type);
 
     try {
-        const res = await axios.post(`${import.meta.env.vite_api_url}/add-product`, formDataToSend, {
+        const res = await api.post('/add-product', formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 

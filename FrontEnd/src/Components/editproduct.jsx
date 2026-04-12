@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Save } from "lucide-react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EditProduct = () => {
@@ -32,7 +32,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.vite_api_url}/product/${productId}`);
+        const response = await api.get(`/product/${productId}`);
         const product = response.data;
         setFormData({
           title: product.title || "",
@@ -84,7 +84,7 @@ const EditProduct = () => {
     });
 
     try {
-      const res = await axios.put(`${import.meta.env.vite_api_url}/update-item/${productId}`, formDataToSend, {
+      const res = await api.put(`/update-item/${productId}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.message === "Product updated successfully") {

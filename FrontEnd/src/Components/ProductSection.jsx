@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import SearchBar from "./SearchBar";
 import CategorySection from "./CategorySection";
 
@@ -22,7 +22,7 @@ const ProductSection = () => {
         setLoading(true);
         setError(null);
 
-        const localProductsResponse = await axios.get(`${import.meta.env.vite_api_url}/products`);
+        const localProductsResponse = await api.get('/products');
         console.log("Local products response:", localProductsResponse.data);
         
         const localProducts = localProductsResponse.data.products || [];

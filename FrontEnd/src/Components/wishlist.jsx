@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -18,7 +18,7 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.vite_api_url}/wishlist/${username}`);
+      const response = await api.get(`/wishlist/${username}`);
       setWishlist(response.data);
     } catch (error) {
       console.error("Error fetching wishlist", error);
@@ -27,7 +27,7 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      await axios.delete(`${import.meta.env.vite_api_url}/dwishlist/${username}/${productId}`);
+      await api.delete(`/dwishlist/${username}/${productId}`);
       setWishlist(wishlist.filter((item) => item.product_id !== productId));
     } catch (error) {
       console.error("Error removing item from wishlist", error);

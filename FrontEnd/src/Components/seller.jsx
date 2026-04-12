@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 const UserProfile = () => {
   const { userId } = useParams();  // Fetch userId from URL
@@ -14,11 +14,11 @@ const UserProfile = () => {
       setLoading(true);
       try {
         // Fetch Seller Profile (name, email, rating)
-        const userRes = await axios.get(`${import.meta.env.vite_api_url}/seller-profile/${userId}`);
+        const userRes = await api.get(`/seller-profile/${userId}`);
         setUser(userRes.data);
 
         // Fetch Products by Seller
-        const productsRes = await axios.get(`${import.meta.env.vite_api_url}/seller-products/${userId}`);
+        const productsRes = await api.get(`/seller-products/${userId}`);
         setProducts(productsRes.data);
       } catch (err) {
         setError("Failed to load user profile.");

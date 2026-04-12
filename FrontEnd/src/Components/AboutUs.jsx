@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { Users, ShoppingBag, Star, TrendingUp } from "lucide-react";
 
 const AboutUs = () => {
@@ -16,7 +16,7 @@ const AboutUs = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.vite_api_url}/stats`);
+                const response = await api.get('/stats');
                 setStats(response.data);
             } catch (err) {
                 setError("Failed to load marketplace statistics");
