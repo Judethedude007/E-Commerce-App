@@ -22,10 +22,7 @@ const EditProduct = () => {
     contact_number: "",
     sale_status: 0, // Default to Unsold
     image: null,
-<<<<<<< HEAD
-=======
   listing_type: 0, // 0=factual, 1=bidding
->>>>>>> 9c184cf (full complete)
   });
 
   useEffect(() => {
@@ -48,14 +45,9 @@ const EditProduct = () => {
           used_time: product.used_time || "",
           used_years: product.used_years || "",
           contact_number: product.contact_number || "",
-<<<<<<< HEAD
-          sale_status: product.sale_status || 0, // Ensure it’s a number (0 = Unsold, 1 = Sold)
-          image: null,
-=======
           sale_status: product.sale_status || 0,
           image: null,
           listing_type: typeof product.listing_type === "number" ? product.listing_type : (product.listing_type === "bidding" ? 1 : 0),
->>>>>>> 9c184cf (full complete)
         });
         if (product.image_url) setImagePreview(product.image_url);
         setLoading(false);
@@ -70,15 +62,11 @@ const EditProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-<<<<<<< HEAD
-    setFormData((prev) => ({ ...prev, [name]: value }));
-=======
     if (name === "listing_type") {
       setFormData((prev) => ({ ...prev, listing_type: value === "bidding" ? 1 : 0 }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
->>>>>>> 9c184cf (full complete)
   };
 
   const handleCheckboxChange = () => {
@@ -137,9 +125,6 @@ const EditProduct = () => {
         <input type="text" name="description" placeholder="Description" className="border p-2 rounded-lg" onChange={handleChange} value={formData.description} />
         <input type="text" name="condition" placeholder="Condition" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
         <input type="text" name="location" placeholder="Location" className="border p-2 rounded-lg" onChange={handleChange} value={formData.location} />
-<<<<<<< HEAD
-        <input type="number" name="price" placeholder="Enter Price" className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
-=======
   <input type="number" name="price" placeholder={formData.listing_type === "bidding" ? "Starting Price" : "Enter Price"} className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
         {/* Listing Type Selection */}
         <div className="mb-2">
@@ -155,7 +140,6 @@ const EditProduct = () => {
             <option value="bidding">Bidding</option>
           </select>
         </div>
->>>>>>> 9c184cf (full complete)
         <select name="category" className="border p-2 rounded-lg" onChange={handleChange} value={formData.category}>
           <option value="">Select Category</option>
           <option value="Electronics">Electronics</option>

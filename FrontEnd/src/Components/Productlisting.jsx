@@ -16,10 +16,7 @@ const ProductListing = () => {
     contact_number: "",
     image: null,
     description: "",
-<<<<<<< HEAD
-=======
   listing_type: 0, // 0=factual, 1=bidding
->>>>>>> 9c184cf (full complete)
   });
 
   const navigate = useNavigate();
@@ -32,17 +29,12 @@ const ProductListing = () => {
   }, []);
 
   const handleChange = (e) => {
-<<<<<<< HEAD
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-=======
     const { name, value, type, checked } = e.target;
     if (name === "listing_type") {
       setFormData((prev) => ({ ...prev, listing_type: value === "bidding" ? 1 : 0 }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
->>>>>>> 9c184cf (full complete)
   };
 
   const handleImageChange = (e) => {
@@ -70,12 +62,8 @@ const ProductListing = () => {
     formDataToSend.append("used_time", formData.used_time);
     formDataToSend.append("used_years", formData.used_years);
     formDataToSend.append("contact_number", formData.contact_number);
-<<<<<<< HEAD
-    formDataToSend.append("image", formData.image);
-=======
   formDataToSend.append("image", formData.image);
   formDataToSend.append("listing_type", formData.listing_type);
->>>>>>> 9c184cf (full complete)
 
     try {
         const res = await axios.post(`${API_BASE_URL}/add-product`, formDataToSend, {
@@ -124,9 +112,6 @@ const ProductListing = () => {
            <input type="text" name="description" placeholder="Description" className="border p-2 rounded-lg" onChange={handleChange} value={formData.description} />
           <input type="text" name="condition" placeholder="Brand" className="border p-2 rounded-lg" onChange={handleChange} value={formData.condition} />
           <input type="text" name="location" placeholder="Location" className="border p-2 rounded-lg" onChange={handleChange} value={formData.location} />
-<<<<<<< HEAD
-          <input type="number" name="price" placeholder="Enter Price" className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
-=======
           <input type="number" name="price" placeholder={formData.listing_type === "bidding" ? "Starting Price" : "Enter Price"} className="border p-2 rounded-lg" onChange={handleChange} value={formData.price} />
           {/* Listing Type Selection */}
           <div className="mb-2">
@@ -142,7 +127,6 @@ const ProductListing = () => {
               <option value="bidding">Bidding</option>
             </select>
           </div>
->>>>>>> 9c184cf (full complete)
 
           {/* Category Selection */}
           <select name="category" className="border p-2 rounded-lg" onChange={handleChange} value={formData.category}>

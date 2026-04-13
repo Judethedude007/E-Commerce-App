@@ -1,49 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star } from "lucide-react";
-
-const ProductDetails = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [product, setProduct] = useState(null);
-    const [sellerName, setSellerName] = useState(""); // Seller's name
-    const [sellerEmail, setSellerEmail] = useState(""); // Seller's email
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isWishlisted, setIsWishlisted] = useState(false);
-    const [showRating, setShowRating] = useState(false); // Control the prompt to rate.
-    const [selectedRating, setSelectedRating] = useState(0); // Track the selected rating.
-    const [communicationType, setCommunicationType] = useState(null); // Track which is clicked
-    const [existingRating, setExistingRating] = useState(0); // track rating
-
-    const username = localStorage.getItem("username");
-
-    useEffect(() => {
-        const fetchProductDetails = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const res = await axios.get(`http://localhost:8081/product/${id}`);
-                setProduct(res.data);
-                fetchUserRating(res.data.user_id) // new function
-                if (res.data.user_id) {
-                    // fetchSellerDetails(res.data.user_id); // Fetch seller details using user_id
-                }
-                checkIfWishlisted(res.data.id);
-            } catch (err) {
-                setError("Failed to load product details.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProductDetails();
-    }, [id]);
-=======
 import { useEffect, useState, useRef } from "react"; 
 import axios from "axios";
 import { ChevronLeft, ChevronRight, Heart, Mail, Phone, Star, MessageSquare, Send } from "lucide-react"; 
@@ -157,57 +112,17 @@ const ProductDetails = () => {
             console.error("Failed to load chat history:", err);
         }
     };
->>>>>>> 9c184cf (full complete)
 
     const fetchUserRating = async (sellerId) => {
         if (!sellerId) return;
         try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${username}`);
-            //This should be some int from the data being returned as well.
-=======
-            const res = await axios.get(`http://localhost:8081/user-rating/${sellerId}/${userIdString}`);
->>>>>>> 9c184cf (full complete)
-=======
             const res = await axios.get(`${API_BASE_URL}/user-rating/${sellerId}/${userIdString}`);
->>>>>>> 8fb8d9f (refactor: read API base from env)
             setExistingRating(res?.data.rating || 0);
         } catch (error) {
             console.error("Error fetching rating", error);
             setExistingRating(0);
         }
     }
-<<<<<<< HEAD
-
-    // Fetch seller's name and email from backend
-    const fetchSellerDetails = async (userId) => {
-        if (!userId) return;
-        try {
-            const res = await axios.get(`http://localhost:8081/seller/${userId}`);
-            setSellerName(res.data.seller_name || "Unknown Seller");
-            setSellerEmail(res.data.seller_email || "Not Available");
-        } catch (error) {
-            console.error("Error fetching seller details:", error);
-            setSellerName("Unknown Seller");
-            setSellerEmail("Not Available");
-        }
-    };
-
-    const checkIfWishlisted = async (productId) => {
-        if (!username) return;
-        try {
-            const res = await axios.get(`http://localhost:8081/wishlist/${username}`);
-            const wishlistedProducts = res.data.map((item) => ({
-                ...item,
-                isSold: item.sale_status === 1, // Add `isSold` flag based on sale_status
-            }));
-            setIsWishlisted(wishlistedProducts.some((item) => item.product_id === parseInt(productId)));
-            setProduct((prev) => ({
-                ...prev,
-                isSold: wishlistedProducts.some((item) => item.product_id === parseInt(productId) && item.isSold),
-            }));
-=======
     
     const checkIfWishlisted = async (productId) => {
         if (!userIdString) return;
@@ -215,26 +130,11 @@ const ProductDetails = () => {
             const res = await axios.get(`${API_BASE_URL}/wishlist/${userIdString}`);
             const wishlistedProducts = res.data.map((item) => item.product_id);
             setIsWishlisted(wishlistedProducts.includes(parseInt(productId)));
->>>>>>> 9c184cf (full complete)
         } catch (error) {
             console.error("Error checking wishlist status:", error);
         }
     };
 
-<<<<<<< HEAD
-    const handleAddToWishlist = async () => {
-        if (!username) {
-            alert("Please log in to add items to your wishlist.");
-            return;
-        }
-
-        try {
-            await axios.post("http://localhost:8081/iwishlist", {
-                username,
-                product_id: id,
-            });
-
-=======
     const fetchWalletBalance = async () => {
         if (!userIdString) return;
         try {
@@ -334,7 +234,6 @@ const ProductDetails = () => {
                 username: userIdString, 
                 product_id: id,
             });
->>>>>>> 9c184cf (full complete)
             setIsWishlisted(true);
             alert("Item added to wishlist!");
         } catch (error) {
@@ -343,15 +242,9 @@ const ProductDetails = () => {
     };
 
     const startPrompt = (type) => {
-<<<<<<< HEAD
-        setCommunicationType(type); // Set which is selected
-        setSelectedRating(existingRating) // load the current ones
-        setShowRating(true); // Activate the UI for the prompt.
-=======
         setCommunicationType(type);
         setShowRating(true);
         localStorage.setItem("showRateSeller", "1");
->>>>>>> 9c184cf (full complete)
     };
 
     const handleEmailSeller = () => {
@@ -367,32 +260,6 @@ const ProductDetails = () => {
         const message = `I am interested in your listing: ${product.title}`;
         const whatsappLink = `https://wa.me/${product.contact_number}?text=${encodeURIComponent(message)}`;
         window.open(whatsappLink, '_blank');
-<<<<<<< HEAD
-        startPrompt('whatapp');
-    };
-
-    const sendRatingToBackend = async () => {
-        try {
-            if (selectedRating == 0) {
-                alert("Must submit value greater than zero.");
-                return;
-            }
-
-            //Call the API here.
-            const res = await axios.post("http://localhost:8081/rate-seller", {
-                sellerId: product.user_id,
-                rating: parseInt(selectedRating),
-                username: username
-            });
-
-            if (communicationType === 'email') {
-                window.location.href = `mailto:${product?.seller_email}?subject=Interest in ${product.title}`;
-            }
-
-            //Add in backend information
-            setShowRating(false);
-            setExistingRating(selectedRating); // this works because we are tracking success
-=======
         startPrompt('whatsapp');
     };
     
@@ -418,34 +285,10 @@ const ProductDetails = () => {
             });
             setShowRating(false);
             setExistingRating(selectedRating);
->>>>>>> 9c184cf (full complete)
         } catch (error) {
             console.error("Failed to send rating:", error);
             alert("Failed to send rating.");
         } finally {
-<<<<<<< HEAD
-            //Reset
-            //   setSelectedRating(0);  no longer clearing ratings for editing
-            //   setShowRating(false);
-            setCommunicationType(null);
-        }
-    };
-
-    const renderStars = () => {
-        return (
-            <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                        key={star}
-                        size={24}
-                        className={`cursor-pointer ${star <= selectedRating ? "text-yellow-500" : "text-gray-400"}`}
-                        onClick={() => setSelectedRating(star)}
-                    />
-                ))}
-            </div>
-        );
-    };
-=======
             setCommunicationType(null);
         }
     };
@@ -542,25 +385,12 @@ const ProductDetails = () => {
             ))}
         </div>
     );
->>>>>>> 9c184cf (full complete)
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!product) return <p>Product not found</p>;
 
     const images = Array.isArray(product.images) ? product.images : [product.image || product.image_url];
-<<<<<<< HEAD
-
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Navigation Bar */}
-            <div className="bg-white shadow-sm sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <button
-                        onClick={() => navigate("/")}
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-                    >
-=======
     
     // --- SUB-COMPONENTS ---
 
@@ -609,212 +439,11 @@ const ProductDetails = () => {
             <div className="bg-white shadow-sm sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <button onClick={() => navigate("/")} className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
->>>>>>> 9c184cf (full complete)
                         <ChevronLeft className="w-4 h-4 mr-2" />
                         Back to Home
                     </button>
                 </div>
             </div>
-<<<<<<< HEAD
-
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-                    </div>
-                ) : error ? (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        {error}
-                    </div>
-                ) : !product ? (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
-                        Product not found
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Left Column - Images */}
-                        <div className="space-y-4">
-                            {/* Main Image */}
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="relative aspect-square">
-                                    <img 
-                                        src={images[currentImageIndex]} 
-                                        alt={product.title} 
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {images.length > 1 && (
-                                        <>
-                                            <button
-                                                onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
-                                            >
-                                                <ChevronLeft size={24} />
-                                            </button>
-                                            <button
-                                                onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
-                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
-                                            >
-                                                <ChevronRight size={24} />
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Thumbnail Grid */}
-                            {images.length > 1 && (
-                                <div className="grid grid-cols-4 gap-2">
-                                    {images.map((image, index) => (
-                                        <button
-                                            key={index}
-                                            onClick={() => setCurrentImageIndex(index)}
-                                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
-                                                currentImageIndex === index 
-                                                    ? 'border-green-500' 
-                                                    : 'border-transparent hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <img 
-                                                src={image} 
-                                                alt={`${product.title} - Image ${index + 1}`}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Right Column - Product Details */}
-                        <div className="space-y-6">
-                            {/* Product Info */}
-                            <div className="bg-white rounded-lg shadow-sm p-6">
-                                <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.title}</h1>
-                                
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl font-bold text-green-600">₹{product.price?.toFixed(2)}</span>
-                                        {product.condition && (
-                                            <span className="px-2 py-1 text-sm bg-gray-100 text-gray-600 rounded-full">
-                                                {product.condition}
-                                            </span>
-                                        )}
-                                    </div>
-                                    {!id.startsWith("fake-") && (
-                                        <button
-                                            onClick={handleAddToWishlist}
-                                            disabled={isWishlisted}
-                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
-                                                isWishlisted
-                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                    : 'bg-green-600 text-white hover:bg-green-700'
-                                            }`}
-                                        >
-                                            <Heart size={20} className={isWishlisted ? 'fill-current' : ''} />
-                                            <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div className="space-y-4 mb-6">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-sm text-gray-500">Category</p>
-                                            <p className="font-medium">{product.category || "N/A"}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500">Used For</p>
-                                            <p className="font-medium">{product.used_time || ""} {product.used_years || "N/A"}</p>
-                                        </div>
-                                    </div>
-                                    {product.description && (
-                                        <div>
-                                            <p className="text-sm text-gray-500">Description</p>
-                                            <p className="font-medium whitespace-pre-wrap">{product.description}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Seller Info */}
-                            <div className="bg-white rounded-lg shadow-sm p-6">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                                            <span className="text-xl font-semibold text-gray-600">
-                                                {product?.seller_name?.[0]?.toUpperCase() || 'S'}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold text-gray-900">{product?.seller_name || "Unknown Seller"}</h3>
-                                            <div className="flex items-center space-x-2">
-                                                <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
-                                                    <span className="text-yellow-500 mr-1">⭐</span>
-                                                    <span className="font-medium">{product?.seller_rating || "0.0"}</span>
-                                                    <span className="text-gray-500 ml-1">({product?.total_ratings || 0})</span>
-                                                </div>
-                                                <button
-                                                    onClick={() => navigate(`/user-profile/${product.user_id}`)}
-                                                    className="text-sm text-blue-600 hover:text-blue-800"
-                                                >
-                                                    View Profile
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <button
-                                        onClick={handleEmailSeller}
-                                        className={`flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 ${
-                                            product?.isSold ? "cursor-not-allowed opacity-50" : "hover:bg-red-100 hover:text-red-600"
-                                        } transition group`}
-                                        disabled={product?.isSold}
-                                    >
-                                        <Mail className={`w-5 h-5 text-gray-400 ${product?.isSold ? "" : "group-hover:text-red-600"} mr-2`} />
-                                        <span className="font-medium">{product?.isSold ? "Sold" : "Contact via Email"}</span>
-                                    </button>
-                                    <button
-                                        onClick={handleWhatsAppSeller}
-                                        className={`flex items-center justify-center px-4 py-3 border border-gray-200 rounded-lg text-gray-700 ${
-                                            product?.isSold ? "cursor-not-allowed opacity-50" : "hover:bg-green-100 hover:text-green-600"
-                                        } transition group`}
-                                        disabled={product?.isSold}
-                                    >
-                                        <Phone className={`w-5 h-5 text-gray-400 ${product?.isSold ? "" : "group-hover:text-green-600"} mr-2`} />
-                                        <span className="font-medium">{product?.isSold ? "Sold" : "Contact via WhatsApp"}</span>
-                                    </button>
-                                </div>
-
-                                {/* Rating Section */}
-                                {showRating && (
-                                    <div className="border-t pt-6">
-                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Rate this Seller</h4>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-4">
-                                                {renderStars()}
-                                                <span className="text-sm text-gray-500">
-                                                    {selectedRating > 0 ? `${selectedRating} out of 5` : 'Select rating'}
-                                                </span>
-                                            </div>
-                                            <button
-                                                onClick={sendRatingToBackend}
-                                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-                                                disabled={selectedRating === 0}
-                                            >
-                                                Submit Rating
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-=======
             
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -933,7 +562,6 @@ const ProductDetails = () => {
             
             {/* Floating Chat Window */}
             {product && <ChatWindow />}
->>>>>>> 9c184cf (full complete)
         </div>
     );
 };
