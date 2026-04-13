@@ -215,6 +215,7 @@ npm run dev            # starts on http://localhost:8081
 
 ```bash
 cd ../FrontEnd
+cp .env.example .env   # fill in VITE_API_BASE_URL (see Environment Variables below)
 npm install
 npm run dev            # starts on http://localhost:5173
 ```
@@ -223,7 +224,7 @@ npm run dev            # starts on http://localhost:5173
 
 ## 🔑 Environment Variables
 
-Create a `.env` file inside the `BackEnd/` directory:
+### Backend — create a `.env` file inside `BackEnd/`
 
 ```env
 # MySQL
@@ -245,6 +246,18 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Session
 SESSION_SECRET=your_session_secret
 ```
+
+### Frontend — create a `.env` file inside `FrontEnd/` (copy from `FrontEnd/.env.example`)
+
+```env
+# Backend API base URL — no trailing slash
+# Local development:
+VITE_API_BASE_URL=http://localhost:8081
+# Production (replace with your deployed backend URL):
+# VITE_API_BASE_URL=https://your-new-backend.onrender.com
+```
+
+> **Note:** The `VITE_` prefix is required by [Vite](https://vitejs.dev/guide/env-and-mode) so the variable is exposed to browser code. The value is read in `FrontEnd/src/config/apiBase.js`.
 
 ---
 
