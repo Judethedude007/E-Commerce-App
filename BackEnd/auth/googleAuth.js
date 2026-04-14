@@ -88,7 +88,7 @@ router.get(
               // Redirect to frontend with user data
               const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
               res.redirect(
-                `${frontendUrl}/login?username=${newUser[0].username}&email=${newUser[0].email}`
+                `${frontendUrl}/Login?username=${newUser[0].username}&email=${newUser[0].email}`
               );
             });
           });
@@ -96,7 +96,7 @@ router.get(
           // User already exists, redirect to frontend with user data
           const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
           res.redirect(
-            `${frontendUrl}/login?username=${results[0].username}&email=${results[0].email}`
+            `${frontendUrl}/Login?username=${results[0].username}&email=${results[0].email}`
           );
         }
       });
