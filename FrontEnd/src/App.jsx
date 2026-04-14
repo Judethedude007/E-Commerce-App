@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./Components/Navbar";
 import Home from "./pages/Homepage";
@@ -17,6 +17,7 @@ import ProductMsg from "./pages/ProductMsg";
 
 const App = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const showNavbar = location.pathname === "/" || location.pathname === "/Sellitems";
 
   const [user, setUser] = useState(() => localStorage.getItem("username") || null);
@@ -30,6 +31,21 @@ const App = () => {
       setUser(storedUser);
     }
   }, []);
+
+  // Handle Google OAuth redirect: /?username=...&email=...
+  useEffect(() => {
+    if (location.pathname === "/") {
+      const params = new URLSearchParams(location.search);
+      const username = params.get("username");
+      const email = params.get("email");
+      if (username && email) {
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
+        setUser(username);
+        navigate("/", { replace: true });
+      }
+    }
+  }, [location, navigate]);
 
   return (
     <>
