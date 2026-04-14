@@ -27,7 +27,7 @@ if (oauthEnabled) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:8081/auth/google/callback",
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:8081/auth/google/callback",
       },
       (accessToken, refreshToken, profile, done) => {
         console.log("Google profile:", profile);
@@ -86,21 +86,23 @@ router.get(
               }
 
               // Redirect to frontend with user data
+              const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
               res.redirect(
-                `http://localhost:5173/login?username=${newUser[0].username}&email=${newUser[0].email}`
+                `${frontendUrl}/login?username=${newUser[0].username}&email=${newUser[0].email}`
               );
             });
           });
         } else {
           // User already exists, redirect to frontend with user data
+          const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
           res.redirect(
-            `http://localhost:5173/login?username=${results[0].username}&email=${results[0].email}`
+            `${frontendUrl}/login?username=${results[0].username}&email=${results[0].email}`
           );
         }
       });
     } catch (error) {
       console.error("Error during Google callback:", error);
-      res.redirect("http://localhost:5173");
+      res.redirect(process.env.FRONTEND_URL || "http://localhost:5173");
     }
   }
 );
