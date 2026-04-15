@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import SearchBar from "./SearchBar";
+import Loader from "./Loader";
 import CategorySection from "./CategorySection";
 import API_BASE_URL from "../config/apiBase";
 
@@ -111,17 +112,12 @@ const ProductSection = () => {
     }
   }, [location, products]);
 
-  if (loading) {
-    return (
-        <div className="min-h-screen flex justify-center items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        </div>
-    );
-}
+  
   if (error) return <div className="text-center text-red-500 text-xl">{error}</div>;
 
   return (
     <>
+      {loading && <Loader />}
       <div className="w-full mb-2">
         <CategorySection setSelectedCategory={setSelectedCategory} />
       </div>
