@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import SearchBar from "./SearchBar";
-import Loader from "./Loader";
+import Loader from "./loader";
 import CategorySection from "./CategorySection";
 import API_BASE_URL from "../config/apiBase";
 
